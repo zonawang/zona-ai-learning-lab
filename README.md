@@ -19,6 +19,9 @@ gantt
     
     section 智慧升級
     LINE AI Bot (Gemini 2.5 多模態) :crit, p2, 2026-05-25, 5d
+    
+    section 記憶與代理
+    LINE Memory Bot (占星水晶專家) :active, p3, 2026-06-02, 5d
 ```
 
 ---
@@ -61,16 +64,40 @@ gantt
 
 ---
 
+### 📍 🔮 第三站：LINE Memory Bot（長效記憶占星水晶專家）
+> **登峰：融合 Agent 框架、永久雲端記憶與多模態分析，打造有溫度的長效智慧助理。**
+
+為了解決雲端 Serverless（如 Cloud Run）無狀態容器重啟導致對話記憶消失的問題，本專案引進了 Google 最新的 **ADK (Agent Development Kit)** 智慧代理框架，並首創自製的中繁體中文記憶體檢索匹配器，將使用者的每一次對話、星盤與水晶特徵永久刻在 **Cloud Firestore**。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-memory-bot/tree/main)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://reurl.cc/qpRD2y)
+*   **核心技術：**
+    *   `Google ADK (Agent Development Kit)` 與 `PreloadMemoryTool`
+    *   `Google Cloud Firestore` 永久雲端資料庫（`ChineseFirestoreMemoryService`）
+    *   `Vertex AI Gemini 2.5 Flash` 多模態影像解析
+    *   `Node.js 22` 混血模組相容啟動旗標（`--experimental-require-module`）
+*   **關鍵亮點：**
+    *   **記憶預載（PreloadMemoryTool）**：只需一行程式碼，在每次對話啟動時自動預載使用者的歷史互動與生日星盤設定。
+    *   **獨家中文分詞修補（Chinese Word Segmentation Regex Patch）**：徹底解決 ADK 內建 `InMemoryMemoryService` 僅支援英文分詞的 Bug，實作中繁體中文漢字與占星高頻詞彙的匹配器。
+    *   **多模態影像鑑定**：傳送水晶礦石照片，機器人自動轉為 Base64 並透由 Vertex AI Gemini 2.5 Flash 鑑定其脈輪與五行共振特徵。
+    *   **長效記憶整合**：在隔了幾天後對話，機器人仍能根據 Firestore 的持久記憶，記住您的生日、星座以及上次傳送的水晶照片特徵，給出高度客製化的諮詢回覆。
+    *   **全免密雲端部署**：安全託管於 **Google Cloud Run**，利用 IAM / 應用程式預設憑證（ADC）安全存取 Google 資源，免除硬編碼 API 金鑰的安全漏洞。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API, Rich Menu, Flex Message |
-| **人工智慧 (AI/LLM)** | Gemini 2.5 Multimodal, Prompt Engineering |
-| **雲端部署 (Deployment)** | Google Apps Script, Vercel / Render, Cloud Functions |
-| **資訊安全 (Security)** | IAM, Passwordless integration, Environment Variables |
+| **通訊渠道 (Messaging)** | LINE Messaging API, Rich Menu, Flex Message, Blob API |
+| **人工智慧 (AI/LLM)** | Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
+| **雲端部署 (Deployment)** | Cloud Run, Google Apps Script, Vercel / Render |
+| **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資訊安全 (Security)** | Application Default Credentials (ADC), IAM, Secretless Auth |
+| **開發語言與環境** | Node.js 22 (--experimental-require-module), ESM/CJS |
 | **輔助開發 (AI Copilot)** | Cursor, ChatGPT, Claude |
 
 ---
