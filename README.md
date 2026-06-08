@@ -24,7 +24,7 @@ gantt
     LINE Memory Bot (占星水晶專家) :active, p3, 2026-06-02, 5d
     
     section 動態體驗
-    LINE Quick Reply Bot (動態建議按鈕) :active, p4, 2026-06-08, 5d
+    LINE Quick Reply Bot (動態建議) :active, p4, 2026-06-08, 5d
 ```
 
 ---
