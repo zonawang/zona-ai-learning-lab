@@ -22,6 +22,9 @@ gantt
     
     section 記憶與代理
     LINE Memory Bot (占星水晶專家) :active, p3, 2026-06-02, 5d
+    
+    section 動態體驗
+    LINE Quick Reply Bot (動態建議按鈕) :active, p4, 2026-06-08, 5d
 ```
 
 ---
@@ -86,13 +89,34 @@ gantt
 
 ---
 
+### 📍 💬 第四站：LINE Quick Reply Bot（動態追問建議與極致對話體驗）
+> **精進：根據上下文動態預測使用者下一步，提升互動體驗。**
+
+讓對話更自然、更流暢！本專案的核心在於實現「動態追問機制」，捨棄傳統死板的靜態按鈕選單，由 Gemini 2.5 Flash 在生成對話回答的當下，即時預測最符合當前語境的 3 個第一人稱追問問題，並自動轉換成 LINE 鍵盤上方的 Quick Reply 建議按鈕。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-quick-reply/tree/main)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/p/c4dba34cad43)
+*   **核心技術：**
+    *   `Google ADK (Agent Development Kit)` 智慧代理與 PreloadMemoryTool
+    *   `Gemini 2.5 Flash` 單回合多目標生成 (回答與追問建議預測)
+    *   `LINE Messaging API` 快速回覆鍵盤機制 (`quickReply`)
+    *   `Google Cloud Firestore` 永久對話記憶（`ChineseFirestoreMemoryService`）
+*   **關鍵亮點：**
+    *   **智慧動態追問 (Dynamic Suggestions)**：在對話過程中，由 AI 即時預測並生成 3 個第一人稱的追問選項，點擊即送出，完美契合語境並大幅提升使用者的互動率。
+    *   **單回合零額外成本與延遲**：利用 Prompt 精妙設計，指示 Gemini 在回答最後以 `|||` 與 `|` 作為分隔格式，同時生成主回答與建議問題。後端僅需調用一次 API 即可解析完成，兼顧極速效能與控本效益。
+    *   **20 字元字數限制過濾**：自動化對接 LINE 官方對 Quick Reply Label 的 20 字元上限。透過 Prompt 雙重約束及後端程式碼字符限制，防範因字數過長被系統截斷的難堪情形。
+    *   **智慧 Fallback 機制**：當 LLM 的輸出格式未符預期或分隔符遺漏時，系統將自動套用預設高頻追問按鈕，確保使用者對話歷程在任何極端狀況下皆順暢無阻。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API, Rich Menu, Flex Message, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API, Rich Menu, Flex Message, Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run, Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
