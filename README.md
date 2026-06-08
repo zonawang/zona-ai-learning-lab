@@ -1,6 +1,6 @@
 # 🧪 Zona's AI Learning Lab 
 
-歡迎來到我的 AI 探索與實作實驗室！這裡記錄了我與 AI 助理（Pair Programming）攜手合作，從零開始打造、升級雲端應用程式的精彩歷程。
+歡迎來到我的 AI 探索與實作實驗室！這裡記錄了我與 AI 助理（Google Antigravity）攜手合作，從零開始打造、升級雲端應用程式的精彩歷程。
 
 ---
 
