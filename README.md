@@ -25,6 +25,9 @@ gantt
     
     section 動態體驗
     LINE Quick Reply Bot (動態建議) :active, p4, 2026-06-08, 5d
+    
+    section 視覺極致
+    LINE Flex Message Bot (視覺升級) :active, p5, 2026-06-14, 5d
 ```
 
 ---
@@ -110,13 +113,34 @@ gantt
 
 ---
 
+### 📍 ✨ 第五站：LINE Flex Message Bot（動態隨機推薦與極致視覺卡片）
+> **突破：打造奢華、具互動性的高階 Flex Message，讓對話視覺感拉滿。**
+
+視覺震撼！本專案旨在將互動視覺效果直接拉到極致，設計多款符合現代奢華感、文青風格的高階 Flex Message 卡片，並融入動態隨機洗牌演算機制，給予使用者最尊榮的視覺與互動體驗。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-flex-message)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://reurl.cc/qpeq73)
+*   **核心技術：**
+    *   `LINE Messaging API` 氣泡卡片與輪播展示大廳（`Flex Message Carousel`）
+    *   `Fisher-Yates 隨機洗牌演算法`（確保每次觸發不重複隨機提取 3 款卡片）
+    *   `Google ADK (Agent Development Kit)` 智慧大腦與 Firestore 記憶整併
+    *   `Express` Webhook 精準關鍵字前綴分流（`#水晶` 精準觸發與普通對話分流）
+*   **關鍵亮點：**
+    *   **奢華視覺三大高階範本**：預建精緻細調的「極簡莫蘭迪數位名片 (Glassmorphism Digital Card)」、「星宇極致登機證 (Luxury Boarding Pass)」與「日系文青下午茶菜單 (Cafe Specialty Menu)」，排版與色彩搭配達到極致美感。
+    *   **Fisher-Yates 隨機不重複推薦**：內建七款能量水晶資料庫。透過 Fisher-Yates 洗牌演算法，使用者每次輸入關鍵字時皆能動態獲得 3 款隨機且絕不重複的 Micro-Carousel 精美水晶圖卡。
+    *   **雙重大腦合一與防干擾分流**：全面移植了前幾代專案的 ADK 智慧代理、Firestore 永久記憶與 Gemini 多模態影像解析大腦。同時巧妙設計 `#水晶` 前綴觸發 Flex Message，其餘普通關鍵字與照片上傳則無縫交給 AI 占星師大腦進行流暢對話，互不干擾。
+    *   **本地端權限衝突繞過**：針對 npm install 快取目錄鎖定問題，提供優雅的 `--cache ./.npm-cache` 專案內隔離快取技術，免除不安全的 sudo 權限要求。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API, Rich Menu, Flex Message, Quick Reply, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API, Rich Menu, Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run, Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
