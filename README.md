@@ -15,19 +15,19 @@ gantt
     axisFormat  %b %d
     
     section 基礎奠定
-    LINE Echo Bot (學舌鳥機器人) :active, p1, 2026-05-15, 5d
+    Echo Bot :active, p1, 2026-05-15, 5d
     
     section 智慧升級
-    LINE AI Bot (Gemini 2.5 多模態) :crit, p2, 2026-05-25, 5d
+    AI Bot :crit, p2, 2026-05-25, 5d
     
     section 記憶與代理
-    LINE Memory Bot (占星水晶專家) :active, p3, 2026-06-02, 5d
+    Memory Bot :active, p3, 2026-06-02, 5d
     
     section 動態體驗
-    LINE Quick Reply Bot (動態建議) :active, p4, 2026-06-08, 5d
+    Quick Reply :active, p4, 2026-06-08, 5d
     
     section 視覺極致
-    LINE Flex Message Bot (視覺升級) :active, p5, 2026-06-14, 5d
+    Flex Message :active, p5, 2026-06-14, 5d
 ```
 
 ---
