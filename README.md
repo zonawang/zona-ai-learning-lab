@@ -28,6 +28,9 @@ gantt
     
     section 視覺極致
     Flex Message :active, p5, 2026-06-14, 5d
+    
+    section 靈魂與效能
+    Icon Switch :active, p6, 2026-06-20, 5d
 ```
 
 ---
@@ -134,18 +137,38 @@ gantt
 
 ---
 
+### 📍 🪐 第六站：LINE Icon Switch Bot（動態守護神分身與 Cloud Run 效能優化）
+> **突破：實作動態 Sender 變更以自由切換對話頭像，並完美克服 Cloud Run CPU 凍結踩坑限制。**
+
+擬真靈魂與極致效能！本專案的核心升級在於實作「動態守護神頭像與暱稱切換（Deity Icon Switch）」，並針對 Google Cloud Run 的 CPU 凍結（CPU Throttling）特性進行了底層 Webhook 異步 Promise 機制的徹底改寫，兼顧多對話情境的沉浸感與雲端執行的超高可用性。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-icon-switch)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://reurl.cc/R25A3g)
+*   **核心技術：**
+    *   `LINE Messaging API` 動態寄件者變更（`sender.name` & `sender.iconUrl`）
+    *   `Express 靜態路由`（本機託管靜態資源 `/static`，實現零外鏈頭像依賴）
+    *   `Google Cloud Run CPU Throttling` 背景執行緒凍結應對方案
+    *   `同步 Promise.all` Webhook 異步流程優化
+*   **關鍵亮點：**
+    *   **動態守護神頭像與暱稱切換**：依據使用者諮詢的主題（如事業、愛情、財運），Gemini 會在回覆最前端附加特定守護神標記（如 `[DEITY: ATHENA]`、`[DEITY: VENUS]` 等）。後端自動解析、剝離該標記，並動態將 LINE 的 `sender.name` 與 `sender.iconUrl` 切換為對應的守護神（雅典娜、維納斯、莫伊萊、艾蓮），對話擬真感與沉浸體驗達到極致。
+    *   **靜態資源本機路由安全託管**：頭像圖檔直接存放在本機專案目錄中，透過 Express 開放 `/static` 靜態檔案路由，免去上傳第三方圖床或依賴外鏈的風險，提高自主性與穩定度。
+    *   **徹底攻克 Cloud Run 執行緒凍結**：詳細剖析 Cloud Run 預設「僅在請求處理期間分配 CPU」的縮容/凍結機制（CPU Throttling）。如果 Webhook 使用非同步背景執行並秒回 `res.send('OK')`，會導致 Gemini API 呼叫與 Firestore 永久記憶讀寫在回覆送出的瞬間被完全卡死。本專案將 Webhook 調整回穩定的同步 `Promise.all` 等待機制，徹底解決背景任務無反應的業界痛點。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API, Rich Menu, Flex Message (Carousel), Quick Reply, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender), Rich Menu, Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
-| **雲端部署 (Deployment)** | Cloud Run, Google Apps Script, Vercel / Render |
+| **雲端部署 (Deployment)** | Cloud Run (CPU Throttling Avoidance), Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
 | **資訊安全 (Security)** | Application Default Credentials (ADC), IAM, Secretless Auth |
-| **開發語言與環境** | Node.js 22 (--experimental-require-module), ESM/CJS |
+| **開發語言與環境** | Node.js 22 (--experimental-require-module), ESM/CJS, Express Static |
 | **輔助開發 (AI Copilot)** | Cursor, ChatGPT, Claude |
 
 ---
