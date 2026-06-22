@@ -31,6 +31,9 @@ gantt
     
     section 靈魂與效能
     Icon Switch :active, p6, 2026-06-20, 5d
+    
+    section 奢華網頁
+    Tokyo Trip :active, p7, 2026-06-22, 5d
 ```
 
 ---
@@ -157,6 +160,27 @@ gantt
 
 ---
 
+### 📍 🗾 第七站：Tokyo Trip Itinerary（東京赤坂商務休閒二日遊奢華網頁）
+> **跨界：為三人商務與休閒量身打造的高質感響應式互動行程網頁。**
+
+超齡質感與極致品味！這是一個專為三人東京出差休閒設計的兩日精選行程網頁。網頁摒棄了傳統陽春的條列式排版，採用極致奢華的深色調（Dark Mode）與黃金微光設計，提供流暢的動態效果與響應式互動體驗，完美平衡三位成員的獨特品味與行程需求。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/tokyo-trip)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/p/01b010105e24?postPublishedType=initial)
+*   **核心技術：**
+    *   `HTML5` 語義化標籤與結構設計
+    *   `Vanilla CSS` 高階排版（CSS Grid / Flexbox）與 Glassmorphism 磨砂玻璃特效
+    *   `JavaScript (ES6+)` 響應式事件監聽、動態展開（Accordion）與互動控制
+    *   `Google Maps API` 地圖與精準座標導航對接
+*   **關鍵亮點：**
+    *   **極致黃金微光暗黑美學**：採用頂級 HSL 精密調色盤與細膩的深色背景，搭配磨砂玻璃、流光漸變邊框與懸停微動畫，為出差行程注入奢華感。
+    *   **專屬成員互動介紹與行程分流**：針對三位性格迥異的團隊成員（品味極高預算無上限的主管 E、熱愛科技藝術的 CTO M，以及追求質感與細節的行程規劃者您自己）設計客製化頭像與角色介紹卡片，將商務、米其林餐飲、千本鳥居文化底蘊與 teamLab 數位藝術融合於一體。
+    *   **精準地圖導航無縫對接**：網頁中所有精選景點（如菊乃井赤坂店、迎賓館赤坂離宮、鐵板燒 あかさか、teamLab Borderless 等）皆直接串接 Google Maps 經緯度與專屬店家座標，確保三人行在東京赤坂繁華街區穿梭時「零踩雷、不迷路」。
+    *   **極速 Cloud Run 一鍵容器化託管**：與前幾站 LINE Bot 一樣，網頁完成後也迅速容器化並一鍵部署至 Google Cloud Run，維持一貫的高效託管與秒級加載水準。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
@@ -168,7 +192,7 @@ gantt
 | **雲端部署 (Deployment)** | Cloud Run (CPU Throttling Avoidance), Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
 | **資訊安全 (Security)** | Application Default Credentials (ADC), IAM, Secretless Auth |
-| **開發語言與環境** | Node.js 22 (--experimental-require-module), ESM/CJS, Express Static |
+| **開發語言與環境** | Node.js 22 (--experimental-require-module), ESM/CJS, Express Static, Vanilla HTML/CSS/JS |
 | **輔助開發 (AI Copilot)** | Cursor, ChatGPT, Claude |
 
 ---
