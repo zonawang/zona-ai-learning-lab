@@ -34,6 +34,9 @@ gantt
     
     section 奢華網頁
     Tokyo Trip :active, p7, 2026-06-22, 5d
+    
+    section 雙重選單
+    Rich Menu :active, p8, 2026-06-24, 5d
 ```
 
 ---
@@ -181,13 +184,34 @@ gantt
 
 ---
 
+### 📍 🎛️ 第八站：LINE Rich Menu Switch Bot（雙選單流暢切換與五宮格導覽升級）
+> **突破：實作用戶端無縫雙選單切換，搭配高質感五宮格導覽圖與極致圖片壓縮技術。**
+
+絲滑體驗與極致視覺！本專案的核心在於引進 **LINE 雙選單（Dual Rich Menu）無縫用戶端切換** 機制。透過 LINE 原生的 `richmenuswitch` 動作，配合 `alias_main_menu` 與 `alias_five_grids` 別名切換，實現零延遲、完全離線級的選單跳轉。同時，精心設計了五宮格導覽介面，並採用極致圖片壓縮與格式轉換技術，克服 LINE 1MB 的上傳限制，實現高畫質與高效能的完美平衡。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-rich-menu-switch)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/p/58955dd6ad16)
+*   **核心技術：**
+    *   `LINE Messaging API` 雙選單切換（`richmenuswitch` 動作 & 豐富選單別名 `Rich Menu Aliases`）
+    *   `Rich Menu` 五宮格精準點擊區域配置（2x2 + 1 網格坐標劃分）
+    *   `極致圖像縮放與高壓縮率 JPEG 格式轉換`（等比例縮放至 `2500x1686 px` 且小於 `1MB`）
+    *   `Node.js & Express / Cloud Run` 後端高質感靜態導覽回覆
+*   **關鍵亮點：**
+    *   **用戶端零延遲雙選單跳轉**：捨棄伺服器端收到 Postback 再透過 API 重新連結（link）選單的傳統繁複流程，改用手機本地端的 `richmenuswitch` 動作，達成秒級、完全離線無縫切換，為用戶帶來絲滑的使用體驗。
+    *   **精美五宮格與雙向導航**：主選單左半部與五宮格導覽完美連動。點擊主選單按鈕瞬間展現「五宮格導覽圖」，點擊底部「回到上一頁」則秒切回主選單。
+    *   **高畫質無損極致圖片壓縮**：解決 LINE 官方限制選單圖片必須小於 1MB 的限制，透過專業縮放與 75% 壓縮率轉化（`769KB`），完美在保全絕對 premium 視覺品質下成功上傳，打造兼具效能與美學的選單。
+    *   **高精度網格坐標劃分**：在 2500x1686 像素的限制下，精準切割出 5 格區域：Top-Left（閱讀指南）、Top-Right（認識水晶）、Mid-Left（淨化方法）、Mid-Right（功效與佩戴），以及 Bottom（返回主選單），實作強大的多功能點擊觸發機制。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender), Rich Menu, Flex Message (Carousel), Quick Reply, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender / Client-side Rich Menu Switch), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (CPU Throttling Avoidance), Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
