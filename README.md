@@ -37,6 +37,9 @@ gantt
     
     section 雙重選單
     Rich Menu :active, p8, 2026-06-24, 5d
+    
+    section 等待與去重
+    Loading Bot :active, p9, 2026-06-30, 5d
 ```
 
 ---
@@ -205,17 +208,38 @@ gantt
 
 ---
 
+### 📍 ⏳ 第九站：LINE Loading Animation Bot（載入中動畫與 Serverless 雙重去重機制）
+> **突破：實作載入中動畫展示，並利用高併發雙重快取阻斷機制解決 Serverless 環境下的重複重試痛點。**
+
+極致順暢與零重複干擾！本專案的核心在於引進 **LINE 載入中動畫（Loading Animation）**，為 LLM 等繁重非同步任務提供極致絲滑的等待體驗。同時，針對 Google Cloud Run 在收到回應後 CPU 立即凍結的痛點，實施了 `await Promise.all` 連線保持技術。為了解決連線保持可能導致 LINE 5 秒逾時而自動發起最多 3 次「自動重試（Retry）」的問題，設計了極為精密的**雙重快取防重複去重機制**，確保「僅執行一次 (Exactly-Once)」的高效安全防護。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-loading-animation)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/p/53ec3284e9f1)
+*   **核心技術：**
+    *   `LINE Messaging API` 載入中動畫（`showLoadingAnimation` API，自動依回應發送而動態消失）
+    *   `Serverless 請求連線保持`（`await Promise.all(...)` 鎖定 Cloud Run CPU 資源不被凍結）
+    *   `雙重快取去重機制`（藉由處理中 `activeEvents` 與已完成 `completedEvents` 雙重 Set 完美防重複）
+    *   `記憶體自動管理`（10 分鐘定時排程自動釋放去重快取，防堵高併發 Memory Leak）
+*   **關鍵亮點：**
+    *   **絲滑無縫等待體驗**：在後端處理 Gemini 2.5 Flash 多模態推論等繁重工作時，自動發起載入動畫。用戶可在聊天視窗中看見自然的「讀取中/正在輸入」動畫。當後端推送訊息後，動畫即秒速、自動消失，大幅消除用戶焦慮感。
+    *   **徹底攻克 Serverless CPU 凍結**：詳細剖析 Cloud Run 等平台「一回傳 200 即回收/凍結 CPU 執行緒」的特性，透過 HTTP 連線保持技術，迫使平台在整個 AI 分析與回覆過程中始終給予足夠 CPU 運算資源。
+    *   **雙重快取阻斷 5 秒超時重試**：由於連線保持使 Webhook 回應時間拉長，容易觸發 LINE 的 5 秒重試機制。本專案透過 `activeEvents` 與 `completedEvents` 建立雙層屏障，第二、三次重試進入時，秒速偵測、阻斷並回傳 `200 OK` 拋棄，完美確保後端重度 LLM 任務不被重複觸發與計費。
+    *   **高併發記憶體自動防溢出**：內建定時的排程清理器，每 10 分鐘自動釋放已完成與處理中的快取集合，兼顧了全天候高頻次查詢去重需求，又完美保障了內存安全。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender / Client-side Rich Menu Switch), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender / Client-side Rich Menu Switch / Loading Animation), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
-| **雲端部署 (Deployment)** | Cloud Run (CPU Throttling Avoidance), Google Apps Script, Vercel / Render |
+| **雲端部署 (Deployment)** | Cloud Run (CPU Throttling Avoidance / Connection Holding), Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
-| **資訊安全 (Security)** | Application Default Credentials (ADC), IAM, Secretless Auth |
+| **資訊安全 (Security)** | Application Default Credentials (ADC), IAM, Secretless Auth, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Node.js 22 (--experimental-require-module), ESM/CJS, Express Static, Vanilla HTML/CSS/JS |
 | **輔助開發 (AI Copilot)** | Cursor, ChatGPT, Claude |
 
