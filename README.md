@@ -40,6 +40,9 @@ gantt
     
     section 等待與去重
     Loading Bot :active, p9, 2026-06-30, 5d
+    
+    section 生日與靈數
+    Date Picker :active, p10, 2026-07-01, 5d
 ```
 
 ---
@@ -229,13 +232,34 @@ gantt
 
 ---
 
+### 📍 📅 第十站：LINE Birthdate Picker Bot（生日日期選擇器與生命靈數動態計算）
+> **突破：實作 LINE 原生快速回覆生日日期選擇器，搭配生命靈數遞迴加總演算法，打造沉浸式星座占星諮詢。**
+
+極致流暢與智慧運算！本專案的核心在於引進 **LINE 原生生日日期選擇器（Datetime Picker Action）**。透過快速回覆按鈕（Quick Reply）完美喚起日期面板，並進行了**跨平台相容性優化**，移除極端的最小/最大日期邊界限制，解決了在舊版 LINE App 與 LINE 電腦版（Desktop）上的渲染崩潰痛點。同時，後端以高效的**遞迴相加演算法（Life Path Number Algorithm）**即時拆解並加總西元生日數字至個位數，最後搭配動態追問按鈕「了解我的生命靈數」，引導用戶展開深度水晶與星盤解析。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-datetime-picker)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/p/58a3eb130911)
+*   **核心技術：**
+    *   `LINE Messaging API` 原生日期選擇器（`datetimepicker` 動作 & 快速回覆鍵盤機制）
+    *   `跨平台相容性相容渲染`（解決 PC 電腦版與舊款行動裝置的 UI 崩潰限制）
+    *   `生命靈數遞迴加總演算法`（拆解西元年月日至 $1 \sim 9$ 的遞迴收斂數學運算）
+    *   `動態上下文追問引導`（根據運算結果，動態附帶客製化「了解我的生命靈數」快速回覆按鈕）
+*   **關鍵亮點：**
+    *   **原生日期選擇器無縫喚起**：審視並摒棄死板的手動字串輸入或格式化要求，點擊「認識水晶」等按鈕時底端自動彈出原生日期面板（預設為 2000-01-01），帶給用戶流暢現代的 UI 互動。
+    *   **100% 跨平台不崩潰相容**：針對 Messaging API 日期選取器可能在 LINE Desktop 或舊版 APP 上發生 JSON 解析崩潰的業界痛點，本專案採取了優雅防護，去除任何敏感、不穩定的 min/max 日期極限，實現全平台 100% 安全渲染。
+    *   **高精密生命靈數遞迴運算**：內建極簡而穩健的累加邏輯。例如生日西元 `1995-11-23`，系統即時拆解為 $1+9+9+5+1+1+2+3 = 31 \rightarrow 3+1 = 4$。算法支援任意合法年月日，極速遞迴收斂至生命靈數 $1 \sim 9$。
+    *   **智慧動態引導諮詢**：生日資料輸入並計算完成後，自動在星座諮詢回覆下方動態附帶「了解我的生命靈數」追問按鈕，藉由高契合度的第一人稱引導，將靜態運算轉化為高轉換率的智慧互動流程。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender / Client-side Rich Menu Switch / Loading Animation), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (CPU Throttling Avoidance / Connection Holding), Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
