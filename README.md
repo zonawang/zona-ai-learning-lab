@@ -43,6 +43,9 @@ gantt
     
     section 生日與靈數
     Date Picker :active, p10, 2026-07-01, 5d
+    
+    section 相機與相簿
+    Camera Action :active, p11, 2026-08-01, 5d
 ```
 
 ---
@@ -253,13 +256,34 @@ gantt
 
 ---
 
+### 📍 📸 第十一站：LINE Camera Action Bot（原生相機拍攝與相簿選取觸發）
+> **突破：實作 LINE 原生相機與相簿觸發動作（Camera & Camera Roll Actions），搭配雙軌 Quick Reply 與關鍵字意圖攔截，打造極致順暢的多模態 AI 拍照鑑定體驗。**
+
+零摩擦拍照與全平台相容！本專案的核心在於引進 **LINE 原生相機與相簿觸發動作（Camera & Camera Roll Actions）**。透過 Quick Reply 一鍵喚起手機原生相機與相簿，徹底解決傳統使用者找不到聊天室微小相機按鈕的體驗痛點。針對 LINE 電腦版（Desktop）無法渲染原生 Camera Action 的限制，設計了 **`type: "message"` 文字按鈕與原生 Camera Action 併行的「雙軌 Quick Reply 機制」**，並在後端加入**關鍵字意圖優先攔截器**，讓使用者無論手動輸入或點擊選單，皆能 100% 秒速取得拍攝入口，無縫對接 Gemini 2.5 Flash 多模態 AI 水晶鑑定。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/zona-line-bot-test)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/line-bot-%E5%AF%A6%E6%88%B0-%E7%B5%90%E5%90%88%E5%8E%9F%E7%94%9F%E7%9B%B8%E6%A9%9F-camera-action-%E8%88%87%E7%9B%B8%E7%B0%BF%E9%81%B8%E6%93%87-camera-roll-action-%E6%89%93%E9%80%A0%E6%A5%B5%E8%87%B4%E9%A0%86%E6%9A%A2%E7%9A%84%E5%A4%9A%E6%A8%A1%E6%85%8B-ai-%E6%8B%8D%E7%85%A7%E9%91%91%E5%AE%9A%E9%AB%94%E9%A9%97-284aed43123f?postPublishedType=repub)
+*   **核心技術：**
+    *   `LINE Messaging API` 原生相機與相簿動作（`camera` & `cameraRoll` 動作 & 雙軌 Quick Reply）
+    *   `跨平台相容雙軌選單`（`type: "message"` 文字按鈕與原生 `camera` Action 併行，解決 PC 電腦版 LINE 渲染限制）
+    *   `關鍵字意圖優先攔截`（攔截 `/拍照|相機|鑑定水晶|鑒定水晶/`，秒速彈出相機選單）
+    *   `Google Cloud Run 容器化部署`（動態同步更新 Revision，確保線上 Webhook 服務最新化）
+*   **關鍵亮點：**
+    *   **原生相機與相簿一鍵喚起**：點擊「📸 點我開啟相機」或「🖼️ 點我開啟相簿」Quick Reply，即可零摩擦開啟手機原生相機全螢幕拍攝或開啟相簿，徹底解決使用者找不到聊天室微小相機圖示的體驗痛點。
+    *   **全平台雙軌相容（Message + Camera Action）**：針對 LINE 電腦版（Desktop）不支援渲染原生 Camera Action 的限制，設計了 `type: "message"`（「可以拍照鑒定水晶嗎」）與原生 Camera Action 併行的雙軌選單，保證在 iOS、Android 與 PC 電腦版上 100% 顯示無阻。
+    *   **即時關鍵字意圖攔截**：當使用者手動輸入「可以拍照鑒定水晶嗎」時，Webhook 優先進行關鍵字匹配與秒回引導，將拍攝按鈕第一時間送到使用者眼前，極大幅度提升多模態 AI 的互動率與轉化率。
+    *   **無縫多模態 Gemini AI 鑑定**：使用者完成拍攝送出照片後，後端接收 `image` 事件並將圖片下載轉換為 Base64，無縫串接 Vertex AI Gemini 2.5 Flash 進行脈輪與水晶能量鑑定。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (CPU Throttling Avoidance / Connection Holding), Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
