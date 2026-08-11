@@ -11,44 +11,24 @@
 ```mermaid
 gantt
     title 專案演進時間軸
-    dateFormat  YYYY-MM-DD
-    axisFormat  %b %d
-    
-    section 基礎奠定
-    Echo Bot :active, p1, 2026-05-15, 5d
-    
-    section 智慧升級
-    AI Bot :crit, p2, 2026-05-25, 5d
-    
-    section 記憶與代理
-    Memory Bot :active, p3, 2026-06-02, 5d
-    
-    section 動態體驗
-    Quick Reply :active, p4, 2026-06-08, 5d
-    
-    section 視覺極致
-    Flex Message :active, p5, 2026-06-14, 5d
-    
-    section 靈魂與效能
-    Icon Switch :active, p6, 2026-06-20, 5d
-    
-    section 奢華網頁
-    Tokyo Trip :active, p7, 2026-06-22, 5d
-    
-    section 雙重選單
-    Rich Menu :active, p8, 2026-06-24, 5d
-    
-    section 等待與去重
-    Loading Bot :active, p9, 2026-06-30, 5d
-    
-    section 生日與靈數
-    Date Picker :active, p10, 2026-07-01, 5d
-    
-    section 相機與相簿
-    Camera Action :active, p11, 2026-08-01, 5d
+    dateFormat YYYY-MM-DD
+    axisFormat %m/%d
 
-    section Codex 實戰
-    Cafe Bot :active, p12, 2026-08-11, 5d
+    section LINE Bot 系列
+    Echo        :done,   p1, 2026-05-15, 6d
+    AI Bot      :done,   p2, 2026-05-25, 6d
+    Memory      :done,   p3, 2026-06-02, 6d
+    QuickReply  :done,   p4, 2026-06-08, 6d
+    Flex Msg    :done,   p5, 2026-06-14, 6d
+    IconSwitch  :done,   p6, 2026-06-20, 6d
+    Rich Menu   :done,   p8, 2026-06-24, 6d
+    Loading     :done,   p9, 2026-06-30, 6d
+    DatePicker  :done,   p10, 2026-07-01, 6d
+    Camera      :done,   p11, 2026-08-01, 6d
+    Cafe Bot    :active, p12, 2026-08-11, 6d
+
+    section 其他實作
+    Tokyo Trip  :done,   p7, 2026-06-22, 6d
 ```
 
 ---
