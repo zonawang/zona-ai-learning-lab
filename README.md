@@ -24,7 +24,7 @@ gantt
     Rich Menu     :p8, 2026-06-24, 6d
     Loading Bot   :p9, 2026-06-30, 6d
     Date Picker   :p10, 2026-07-01, 6d
-    Camera Action :p11, 2026-08-01, 6d
+    Camera        :p11, 2026-08-01, 6d
     Cafe Bot      :active, p12, 2026-08-11, 6d
 
     section Other Projects
