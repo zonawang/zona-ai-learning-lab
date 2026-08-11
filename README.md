@@ -1,6 +1,6 @@
 # 🧪 Zona's AI Learning Lab 
 
-歡迎來到我的 AI 探索與實作實驗室！這裡記錄了我與 AI 助理（Google Antigravity）攜手合作，從零開始打造、升級雲端應用程式的精彩歷程。
+歡迎來到我的 AI 探索與實作實驗室！這裡記錄了我與 AI 助理（Google Antigravity、Codex 等）攜手合作，從零開始打造、升級雲端應用程式的精彩歷程。
 
 ---
 
@@ -46,6 +46,9 @@ gantt
     
     section 相機與相簿
     Camera Action :active, p11, 2026-08-01, 5d
+
+    section Codex 實戰
+    Cafe Bot :active, p12, 2026-08-11, 5d
 ```
 
 ---
@@ -277,19 +280,40 @@ gantt
 
 ---
 
+### 📍 ☕ 第十二站：LINE Cafe Bot（Codex 協作開發、Message Action 與 Webhook 部署打通）
+> **突破：首次以 Codex 從零搭建 TypeScript + Express + LINE SDK 架構，並在一天內把 webhook、Message action 與 Cloud Run 部署一路打通。**
+
+從空白到真正上線！本專案的核心在於以 **Codex** 作為 AI coding agent，從零建立 `TypeScript + Express + LINE SDK` 的 LINE Bot 基礎骨架，完整實作 `POST /webhook`、`GET /health`、LINE webhook signature verification 與 Day 1 的 `Message action`。在實作過程中，還處理了 `@line/bot-sdk` runtime 匯入問題、本機 tunnel 不穩與 GitHub SSH 認證等典型工程摩擦，最終將服務穩定部署至 **Google Cloud Run**，讓第一個互動按鈕不只在 localhost 能跑，而是真的能在自己的 LINE channel 回訊息。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-cafe-bot)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%94%A8-codex-%E5%BE%9E%E9%9B%B6%E5%81%9A-line-bot-%E4%B8%8D%E5%8F%AA%E5%AF%AB%E5%87%BA-message-action-%E9%82%84%E6%8A%8A-webhook-%E5%92%8C%E9%83%A8%E7%BD%B2%E4%B8%80%E8%B7%AF%E6%89%93%E9%80%9A-afe696403dc5?postPublishedType=initial)
+*   **核心技術：**
+    *   `TypeScript + Express + @line/bot-sdk` 模組化 LINE Bot 架構
+    *   `LINE Messaging API` Webhook Signature Verification 與 `Message Action` Quick Reply 流程
+    *   `Google Cloud Run` 正式部署與穩定公開 Webhook Endpoint
+    *   `Codex` AI 協作開發與對話式除錯
+*   **關鍵亮點：**
+    *   **從空 repo 到正式上線**：不是在舊專案上修補，而是從空白專案資料夾開始，完整建好 `routes / handlers / actions / messages / services` 模組化結構，讓 Day 1 完成後仍能穩定往 Day 2、Day 3 繼續擴充。
+    *   **Day 1 Message Action 全鏈路打通**：以「使用者傳 `開始` → bot 回快速回覆按鈕 → 點擊後自動送出文字 → bot 回確認訊息」完成第一個可驗收的互動里程碑，一次驗證 webhook、事件解析與 reply API。
+    *   **Runtime、GitHub 與 tunnel 三重實戰踩坑**：實際排除 `@line/bot-sdk` 匯入不穩、GitHub SSH 認證與本機 tunnel 反覆失效等工程摩擦，真實呈現「會 build 不代表真的能跑」的開發現場。
+    *   **Cloud Run 穩定收尾**：最終放棄不穩定的臨時 tunnel，直接部署到 Cloud Run，取得固定公開網址，讓 LINE webhook 狀態、`/health` 檢查與實際 bot 回覆全部穩定落地。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (CPU Throttling Avoidance / Connection Holding), Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
 | **資訊安全 (Security)** | Application Default Credentials (ADC), IAM, Secretless Auth, Exactly-Once Deduplication (雙重快取去重) |
-| **開發語言與環境** | Node.js 22 (--experimental-require-module), ESM/CJS, Express Static, Vanilla HTML/CSS/JS |
-| **輔助開發 (AI Copilot)** | Cursor, ChatGPT, Claude |
+| **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, @line/bot-sdk |
+| **輔助開發 (AI Copilot)** | Codex, Cursor, ChatGPT, Claude |
 
 ---
 
