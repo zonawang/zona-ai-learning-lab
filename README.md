@@ -10,25 +10,25 @@
 
 ```mermaid
 gantt
-    title 專案演進時間軸
+    title Project Timeline
     dateFormat YYYY-MM-DD
     axisFormat %m/%d
 
-    section LINE Bot 系列
-    Echo        :done,   p1, 2026-05-15, 6d
-    AI Bot      :done,   p2, 2026-05-25, 6d
-    Memory      :done,   p3, 2026-06-02, 6d
-    QuickReply  :done,   p4, 2026-06-08, 6d
-    Flex Msg    :done,   p5, 2026-06-14, 6d
-    IconSwitch  :done,   p6, 2026-06-20, 6d
-    Rich Menu   :done,   p8, 2026-06-24, 6d
-    Loading     :done,   p9, 2026-06-30, 6d
-    DatePicker  :done,   p10, 2026-07-01, 6d
-    Camera      :done,   p11, 2026-08-01, 6d
-    Cafe Bot    :active, p12, 2026-08-11, 6d
+    section LINE Bots
+    Echo Bot      :p1, 2026-05-15, 6d
+    AI Bot        :p2, 2026-05-25, 6d
+    Memory Bot    :p3, 2026-06-02, 6d
+    Quick Reply   :p4, 2026-06-08, 6d
+    Flex Message  :p5, 2026-06-14, 6d
+    Icon Switch   :p6, 2026-06-20, 6d
+    Rich Menu     :p8, 2026-06-24, 6d
+    Loading Bot   :p9, 2026-06-30, 6d
+    Date Picker   :p10, 2026-07-01, 6d
+    Camera Action :p11, 2026-08-01, 6d
+    Cafe Bot      :active, p12, 2026-08-11, 6d
 
-    section 其他實作
-    Tokyo Trip  :done,   p7, 2026-06-22, 6d
+    section Other Projects
+    Tokyo Trip    :p7, 2026-06-22, 6d
 ```
 
 ---
