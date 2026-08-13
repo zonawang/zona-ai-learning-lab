@@ -25,7 +25,8 @@ gantt
     Loading Bot   :p9, 2026-06-30, 6d
     Date Picker   :p10, 2026-07-01, 6d
     Camera        :p11, 2026-08-01, 6d
-    Cafe Bot      :active, p12, 2026-08-11, 6d
+    Cafe Bot      :p12, 2026-08-11, 6d
+    Map Grounding :active, p13, 2026-08-12, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
@@ -281,15 +282,39 @@ gantt
 
 ---
 
+### 📍 🗺️ 第十三站：LINE Map Grounding Bot（定位搜尋、Vertex AI 地圖基準與來源卡片）
+> **進化：使用者只要在 LINE 傳送目前位置，Bot 就能透過 Vertex AI Google Maps Grounding，推薦附近咖啡廳並附上可驗證的地圖來源。**
+
+從「先架好咖啡廳 Bot 骨架」正式走向「真的會看地圖」！本專案延續上一站的 Codex 協作開發模式，加入 LINE 原生 **Location Action**，將使用者分享的經緯度交給 **Vertex AI Google Maps Grounding**，搜尋附近 3～5 間咖啡廳。系統採用「英文 Grounding、繁中轉譯」雙階段流程，並將原始 Google Maps 來源整理成 LINE Flex Message 卡片，讓推薦不只好讀，也能直接點回地圖確認。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-map-grounding)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E6%88%91%E7%94%A8-codex-%E5%BE%9E%E7%A9%BA-repo-%E5%81%9A-line-%E5%AE%9A%E4%BD%8D-bot-%E5%85%88%E8%AE%93-bot-%E6%AD%A3%E7%A2%BA%E6%94%B6%E5%88%B0-%E6%88%91%E5%9C%A8%E5%93%AA%E8%A3%A1-aab491005fe3)
+*   **核心技術：**
+    *   `LINE Messaging API` 原生定位訊息與 `Location Action` Quick Reply
+    *   `Vertex AI / Gemini Enterprise Agent Platform` Google Maps Grounding
+    *   `Google Maps Grounding Metadata` 地點來源、`placeId` 與 attribution 解析
+    *   `Application Default Credentials (ADC) + IAM` 免 Gemini API Key 認證
+    *   `Cloud Run + Runtime Service Account` 容器化部署與最小權限執行身分
+*   **關鍵亮點：**
+    *   **傳一個位置就開始搜尋**：使用 LINE 原生 Location Action 取代手打地址，直接取得乾淨的 latitude / longitude，降低地址解析與輸入格式錯誤。
+    *   **有來源的地圖推薦**：不是只讓模型憑記憶回答，而是透過 Google Maps Grounding 搜尋真實店家，並將每個來源做成「在 Google Maps 查看」Flex Message 卡片。
+    *   **英文 Grounding、繁中友善呈現**：先依 Google Maps Grounding 規格完成英文查詢，再用同一個 Vertex AI client 轉為台灣繁體中文；來源 URL 不經模型改寫，兼顧閱讀體驗與事實可靠性。
+    *   **店家與評論來源智慧去重**：實測發現同一店家可能同時回傳店家頁與多個 Review URL，因此使用 `placeId` 與正規化店名去重，優先保留真正的店家頁。
+    *   **Codex 全流程實戰協作**：Codex 從空 repo 搭建架構、比對 Google 文件與 SDK 型別、切換 Vertex AI 認證、執行真實 Grounding 測試、操作 gcloud、部署 Cloud Run，再透過 Cloud Logging 找出「Webhook 200 但 Bot 沒回覆」的非同步生命週期問題。
+    *   **等待體驗與線上可觀測性**：加入 LINE Loading Animation、Push Message 與結構化 logs，讓使用者知道 Bot 正在搜尋，也讓每次事件的開始、耗時、來源數量與回覆結果都能追蹤。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API (Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
-| **人工智慧 (AI/LLM)** | Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
-| **雲端部署 (Deployment)** | Cloud Run (CPU Throttling Avoidance / Connection Holding), Google Apps Script, Vercel / Render |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Location Action / Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
+| **人工智慧 (AI/LLM)** | Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
+| **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding), Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
 | **資訊安全 (Security)** | Application Default Credentials (ADC), IAM, Secretless Auth, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, @line/bot-sdk |
