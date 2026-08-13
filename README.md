@@ -26,7 +26,7 @@ gantt
     Date Picker   :p10, 2026-07-01, 6d
     Camera        :p11, 2026-08-01, 6d
     Cafe Bot      :p12, 2026-08-11, 6d
-    Map Grounding :active, p13, 2026-08-12, 6d
+    Maps Bot      :active, p13, 2026-08-12, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
