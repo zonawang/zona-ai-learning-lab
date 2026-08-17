@@ -27,7 +27,7 @@ gantt
     Camera        :p11, 2026-08-01, 6d
     Cafe Bot      :p12, 2026-08-11, 6d
     Maps Bot      :p13, 2026-08-12, 6d
-    Postback Bot  :active, p14, 2026-08-17, 6d
+    Postback      :active, p14, 2026-08-17, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
