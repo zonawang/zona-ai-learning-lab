@@ -26,7 +26,8 @@ gantt
     Date Picker   :p10, 2026-07-01, 6d
     Camera        :p11, 2026-08-01, 6d
     Cafe Bot      :p12, 2026-08-11, 6d
-    Maps Bot      :active, p13, 2026-08-12, 6d
+    Maps Bot      :p13, 2026-08-12, 6d
+    Postback Bot  :active, p14, 2026-08-17, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
@@ -306,16 +307,38 @@ gantt
 
 ---
 
+### 📍 🔄 第十四站：LINE Postback Action Bot（換一批、工作偏好與搜尋記憶）
+> **互動升級：讓咖啡廳推薦不再只回答一次，而是能沿用上一輪位置繼續搜尋。**
+
+Map Grounding Bot 已經能根據使用者位置推薦附近咖啡廳，但看完結果後，如果想換一批或改找更適合工作的店，原本只能重新分享位置。這次加入 LINE **Postback Action**，讓使用者直接點擊「換一批」或「更適合工作」，Bot 會從 Firestore 取回上一輪的位置、偏好與店家名單，再進行下一次搜尋。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/codex-postback-action)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E6%88%91%E6%83%B3%E6%9B%BF-line-bot-%E5%8A%A0-%E6%8F%9B%E4%B8%80%E6%89%B9-%E6%8C%89%E9%88%95-%E7%B5%90%E6%9E%9C%E5%85%88%E7%A2%B0%E5%88%B0%E4%B8%80%E5%80%8B%E5%95%8F%E9%A1%8C-%E5%AE%83%E6%80%8E%E9%BA%BC%E8%A8%98%E5%BE%97%E4%B8%8A%E4%B8%80%E8%BC%AA-0324fc0aef9c)
+*   **核心技術：**
+    *   `LINE Messaging API` Postback Action 與動態 Quick Reply
+    *   `Cloud Firestore` 短期搜尋 Session、TTL 與 Transaction 處理鎖
+    *   `Vertex AI Google Maps Grounding` 排除上一批店家與工作偏好搜尋
+    *   `Cloud Run` 新舊服務平行部署與 Webhook 可回復切換
+*   **關鍵亮點：**
+    *   **不用重新傳位置就能繼續找**：Postback data 只帶 action 與短 session ID，真正的座標、搜尋偏好和上一批店名保存在 Firestore，按下「換一批」即可沿用原本位置。
+    *   **工作偏好不等於憑空保證**：「更適合工作」會調整搜尋方向，但沒有明確 Maps 證據時，不會自行宣稱店家有插座、Wi-Fi、不限時或安靜。
+    *   **過期、權限與連點都有保護**：Session 綁定原使用者與對話，30 分鐘後失效；Firestore Transaction 鎖可避免使用者連點時重複呼叫模型與重複推送。
+    *   **新功能失敗不拖垮原本搜尋**：Firestore 暫時無法建立 session 時，第一次咖啡廳推薦仍會正常送出，只是不顯示需要 session 的 Postback 按鈕。
+    *   **Webhook 切換保留回頭路**：新版先部署到獨立 Cloud Run service，通過健康檢查後才切換 LINE Webhook；Verify 失敗時會自動回復舊 endpoint。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API (Location Action / Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding), Google Apps Script, Vercel / Render |
-| **資料記憶 (Database/Memory)**| Cloud Firestore, ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
 | **資訊安全 (Security)** | Application Default Credentials (ADC), IAM, Secretless Auth, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, @line/bot-sdk |
 | **輔助開發 (AI Copilot)** | Codex, Cursor, ChatGPT, Claude |
