@@ -27,7 +27,8 @@ gantt
     Camera        :p11, 2026-08-01, 6d
     Cafe Bot      :p12, 2026-08-11, 6d
     Maps Bot      :p13, 2026-08-12, 6d
-    Postback      :active, p14, 2026-08-17, 6d
+    Postback      :p14, 2026-08-17, 6d
+    Action Agent  :active, p15, 2026-08-20, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
@@ -329,6 +330,29 @@ Map Grounding Bot 已經能根據使用者位置推薦附近咖啡廳，但看�
 
 ---
 
+### 📍 ⭐ 第十五站：LINE Cafe Action Agent（Gemini Function Calling 與咖啡收藏管理）
+> **能力升級：在熟悉的 LINE Bot 場景中嘗試 Gemini API Function Calling，讓使用者只要說「收藏第二間」，Bot 就能理解意圖並安全地完成操作。**
+
+Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位置換一批推薦。這次進一步加入 **Gemini Function Calling**：模型不再只產生一段回答，而是把「收藏第二間」、「查看我的收藏」或「刪除收藏第一間」轉成結構化工具呼叫，再由後端驗證推薦清單與使用者身分，經過 LINE 確認後才真正更新 Firestore。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-cafe-action-agent)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E6%88%91%E5%92%8C-codex-%E8%AE%93-line-cafe-bot-%E7%9C%9F%E7%9A%84%E6%9C%83%E5%81%9A%E4%BA%8B-%E5%BE%9E-%E6%94%B6%E8%97%8F%E7%AC%AC%E4%BA%8C%E9%96%93-%E9%96%8B%E5%A7%8B%E7%9A%84-gemini-function-calling-%E5%AF%A6%E4%BD%9C-e2e5455663eb)
+*   **核心技術：**
+    *   `Gemini API Function Calling` 與 `@google/genai` 結構化工具選擇
+    *   `Cloud Firestore` 最近推薦 Context、收藏清單與限時 Pending Action
+    *   `LINE Messaging API` Postback 二次確認、Quick Reply 與 Flex Message
+    *   `Firestore Transaction` 操作歸屬驗證與重複執行防護
+    *   `Google Calendar Template Link` 免 OAuth 的行程預填連結
+*   **關鍵亮點：**
+    *   **Gemini API 的新嘗試**：延續既有 LINE Bot 經驗，進一步實作 Gemini Function Calling，正式替模型定義工具、參數格式與使用時機。
+    *   **自然語言變成可執行操作**：Gemini 將「收藏第二間」轉為 `save_cafe` 與 `cafe_number: 2`，後端再依最近一批推薦找出真正店家，不會只回一句看似成功的文字。
+    *   **模型不直接碰資料庫**：Gemini 只負責理解意圖與選擇工具；新增或刪除收藏前，LINE 會先顯示「確認執行／取消」，讓使用者保有最後決定權。
+    *   **過期、冒用與連點都有保護**：推薦 Context 與 Pending Action 都有使用期限，操作綁定原使用者與原對話，Firestore Transaction 可避免同一確認被重複執行。
+    *   **Codex 從發想到上線全程協作**：Codex 協助整理 MVP、設計安全邊界、完成測試與部署；實機發現 LINE 仍回舊版訊息時，再沿著 Cloud Run 與 Webhook 狀態找出尚未部署的真正原因，最後以新舊服務並存、Verify 失敗自動回復的方式安全切換。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
@@ -336,11 +360,11 @@ Map Grounding Bot 已經能根據使用者位置推薦附近咖啡廳，但看�
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
 | **通訊渠道 (Messaging)** | LINE Messaging API (Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
-| **人工智慧 (AI/LLM)** | Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
+| **人工智慧 (AI/LLM)** | Gemini API Function Calling, Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding), Google Apps Script, Vercel / Render |
-| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
-| **資訊安全 (Security)** | Application Default Credentials (ADC), IAM, Secretless Auth, Exactly-Once Deduplication (雙重快取去重) |
-| **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, @line/bot-sdk |
+| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / Pending Action / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資訊安全 (Security)** | Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Exactly-Once Deduplication (雙重快取去重) |
+| **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, @line/bot-sdk, @google/genai |
 | **輔助開發 (AI Copilot)** | Codex, Cursor, ChatGPT, Claude |
 
 ---
