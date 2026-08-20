@@ -28,7 +28,7 @@ gantt
     Cafe Bot      :p12, 2026-08-11, 6d
     Maps Bot      :p13, 2026-08-12, 6d
     Postback      :p14, 2026-08-17, 6d
-    Action Agent  :active, p15, 2026-08-20, 6d
+    Agent         :active, p15, 2026-08-20, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
