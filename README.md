@@ -29,7 +29,8 @@ gantt
     Maps Bot      :p13, 2026-08-12, 6d
     Postback      :p14, 2026-08-17, 6d
     Agent         :p15, 2026-08-20, 6d
-    Reminder      :active, p16, 2026-08-22, 6d
+    Reminder      :p16, 2026-08-22, 6d
+    Companion     :active, p17, 2026-08-23, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
@@ -378,6 +379,30 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 
 ---
 
+### 📍 ☕ 第十七站：LINE Cafe Companion（個人偏好記憶與 Codex Terra 協作）
+> **從提醒到個人化：Bot 不只記得什麼時候要提醒，也開始記得使用者喜歡什麼樣的咖啡廳。**
+
+上一站的 Reminder Agent 已經能可靠記住未來的咖啡行程；這次則補上更貼近日常的「偏好記憶」。使用者可以直接說「設定我的偏好：安靜、有插座、適合工作」，Bot 會先顯示確認按鈕，確認後將偏好保存為個人資料。下一次使用者傳送位置時，Google Maps Grounding 會優先依這些條件推薦店家，並明確告知本次套用了哪些偏好。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-cafe-companion)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E5%BE%9E%E6%8F%90%E9%86%92%E5%88%B0%E5%81%8F%E5%A5%BD%E8%A8%98%E6%86%B6-%E6%88%91%E7%94%A8-codex-terra-%E8%AE%93-line-cafe-bot-%E4%B8%8D%E5%86%8D%E6%AF%8F%E6%AC%A1%E9%83%BD%E5%BE%9E%E9%A0%AD%E8%AA%8D%E8%AD%98%E4%BD%A0-709722fd5cf9?postPublishedType=initial)
+*   **核心技術：**
+    *   `Gemini Function Calling` 偏好設定、查看、移除與清除的結構化意圖解析
+    *   `Cloud Firestore` 以 LINE `userId` 隔離保存個人偏好，群組中也不會互相混用
+    *   `Vertex AI Google Maps Grounding` 將偏好帶入位置推薦，同時要求模型只引用有來源支持的店家資訊
+    *   `LINE Postback Action` 設定、移除與清除偏好的二次確認
+    *   `Cloud Run` 獨立部署 `line-cafe-companion`、health check 與 LINE Webhook Verify
+    *   `Codex Terra` 從資料模型、跨檔案實作、測試到雲端部署的協作開發
+*   **關鍵亮點：**
+    *   **偏好由使用者明確設定，不靠黑盒子猜測**：第一版不從收藏或聊天紀錄偷偷推論喜好，讓使用者能隨時查看、修改或清除資料。
+    *   **自然語言仍有安全邊界**：Gemini 只負責把「安靜、有插座、適合工作」轉成合法 key；真正寫入 Firestore 前仍必須經過 LINE 確認按鈕。
+    *   **個人化不等於替店家編資料**：偏好只用來調整搜尋方向。插座、Wi-Fi、安靜程度等條件，沒有 Google Maps Grounding 證據時，Bot 會說無法確認，而不是把偏好當成事實。
+    *   **群組也能保有個人界線**：偏好文件以發話者的 LINE `userId` 為主鍵；在群組傳送位置時，只會套用該使用者自己的偏好。
+    *   **從 Sol 到 Terra 的實戰選擇**：前一站以 Codex Sol 完成複雜的排程與安全流程；這次需求範圍清楚、可分段驗證，改用 Codex Terra 完成資料模型、介面流程、測試與部署，實作出能力與成本更平衡的日常開發節奏。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
@@ -385,12 +410,12 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
 | **通訊渠道 (Messaging)** | LINE Messaging API (Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
-| **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間解析), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
+| **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding), Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
-| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
 | **資訊安全 (Security)** | OIDC Task Authentication, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, @line/bot-sdk, @google/genai |
-| **輔助開發 (AI Copilot)** | Codex, Cursor, ChatGPT, Claude |
+| **輔助開發 (AI Copilot)** | Codex Sol / Terra, Cursor, ChatGPT, Claude |
 
 ---
 
