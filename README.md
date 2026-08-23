@@ -28,7 +28,8 @@ gantt
     Cafe Bot      :p12, 2026-08-11, 6d
     Maps Bot      :p13, 2026-08-12, 6d
     Postback      :p14, 2026-08-17, 6d
-    Agent         :active, p15, 2026-08-20, 6d
+    Agent         :p15, 2026-08-20, 6d
+    Reminder      :active, p16, 2026-08-22, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
@@ -353,17 +354,41 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 
 ---
 
+### 📍 ⏰ 第十六站：LINE Cafe Reminder Agent（Gemini 時間理解、Cloud Tasks 與主動提醒）
+> **跨越時間：使用者只要說「兩分鐘後提醒我去第二間」，Bot 就能理解店家與時間，並在指定時刻主動傳送 LINE 訊息。**
+
+收藏咖啡廳、加入 Calendar 之後，還是可能忘記出發。這次延續 Gemini Function Calling，讓模型把「週六下午兩點去第一間，提前一小時提醒」整理成店家編號、行程時間與提前分鐘數；使用者確認後，再由 **Google Cloud Tasks** 記住執行時間。即使 Cloud Run 中途縮到 0，時間一到仍會被任務喚醒，透過 LINE Push Message 主動提醒。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-cafe-reminder-agent)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E6%88%91%E6%94%B6%E8%97%8F%E4%BA%86%E5%92%96%E5%95%A1%E5%BB%B3-%E9%82%84%E6%98%AF%E6%9C%83%E5%BF%98%E8%A8%98%E5%8E%BB-%E6%88%91%E5%92%8C-codex-%E8%AE%93-line-bot-%E5%9C%A8%E6%AD%A3%E7%A2%BA%E6%99%82%E9%96%93%E4%B8%BB%E5%8B%95%E6%8F%90%E9%86%92%E6%88%91-a97504c6213a)
+*   **核心技術：**
+    *   `Gemini Function Calling` 自然語言日期、店家與提前提醒時間解析
+    *   `Google Cloud Tasks` 未來任務排程、自動重試與 Cloud Run 喚醒
+    *   `OIDC ID Token` Task endpoint 的 audience 與 service account 身分驗證
+    *   `Cloud Firestore` Reminder 狀態、Pending Action、Transaction 與 Delivery Lock
+    *   `LINE Push Message + Retry Key` 主動通知與重複推播防護
+*   **關鍵亮點：**
+    *   **自然語言直接變成未來提醒**：Gemini 將「五分鐘後提醒我去第二間」轉成 `schedule_cafe_reminder`，後端再驗證店家、時間、30 秒下限與 30 天排程範圍。
+    *   **Serverless 也能可靠記住時間**：提醒不放在 Cloud Run process 記憶體，而是交給 Cloud Tasks；Instance 即使重啟或縮到 0，也不會讓排程跟著消失。
+    *   **公開服務仍有任務專用門禁**：Cloud Tasks 呼叫時附上 Google 簽發的 OIDC token，後端會驗證 audience、service account email 與 `email_verified`；無 token 的請求會回 `401`。
+    *   **重試不等於重複打擾**：Firestore Transaction 與 Delivery Lock 管理內部處理狀態，固定的 LINE Retry Key 則避免外部 API 重試造成同一提醒重複推播。
+    *   **取消時先守住資料狀態**：先把 Reminder 標成 `cancelled`，再刪除 Cloud Task；即使刪除 API 暫時失敗，後端仍會依狀態擋下推播。
+    *   **Codex 協作完成真實雲端驗證**：除了 14 項自動測試，也執行真實 Gemini Function Call、Cloud Tasks OIDC smoke test、Cloud Run health check 與 LINE Webhook Verify；部署遇到 build 成功但發布未完成時，再沿著映像與 revision 狀態完成安全上線。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API (Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
-| **人工智慧 (AI/LLM)** | Gemini API Function Calling, Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
-| **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding), Google Apps Script, Vercel / Render |
-| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / Pending Action / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
-| **資訊安全 (Security)** | Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Exactly-Once Deduplication (雙重快取去重) |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
+| **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間解析), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
+| **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding), Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
+| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資訊安全 (Security)** | OIDC Task Authentication, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, @line/bot-sdk, @google/genai |
 | **輔助開發 (AI Copilot)** | Codex, Cursor, ChatGPT, Claude |
 
