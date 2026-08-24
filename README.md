@@ -31,6 +31,7 @@ gantt
     Agent         :p15, 2026-08-20, 6d
     Reminder      :p16, 2026-08-22, 6d
     Companion     :active, p17, 2026-08-23, 6d
+    Datetime Picker :p18, 2026-08-24, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
@@ -403,6 +404,30 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 
 ---
 
+### 📍 🗓️ 第十八站：LINE Datetime Picker Action（從推薦到可執行行程）
+> **行動化：讓使用者從咖啡廳推薦卡直接選日期與時間，並一鍵加入 Google Calendar。這次以 Codex Luna 完成開發。**
+
+上一篇的 Cafe Companion 讓 Bot 記住「使用者想找什麼樣的咖啡廳」。這次延續同一條使用流程，替每張推薦卡加入 LINE 原生 **Datetime Picker Action**：使用者選定一家店後，不必再手動輸入時間，直接選日期、時間，Bot 就會回覆正確店名與行程預填連結。偏好記憶負責縮小「去哪裡」的範圍，Datetime Picker 則把「什麼時候去」定下來。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/codex-datetime-picker-action)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E5%BE%9E%E8%A8%98%E4%BD%8F%E5%81%8F%E5%A5%BD%E5%88%B0%E9%81%B8%E5%A5%BD%E6%99%82%E9%96%93-%E6%88%91%E7%94%A8-codex-luna-%E5%92%8C-line-datetime-picker-%E6%8A%8A%E5%92%96%E5%95%A1%E5%BB%B3%E6%8E%A8%E8%96%A6%E8%AE%8A%E6%88%90%E7%9C%9F%E7%9A%84%E8%A1%8C%E7%A8%8B-3e805f0a7255?postPublishedType=initial)
+*   **核心技術：**
+    *   `LINE Messaging API` 原生 `Datetime Picker Action`（`mode: "datetime"`）
+    *   `Cloud Firestore` 短期搜尋 Session、使用者／對話綁定與 30 分鐘有效期限
+    *   `LINE Postback Event` 的 `params.datetime` 驗證與店家編號對應
+    *   `台北時區` 日期轉換與 `Google Calendar Template Link` 行程預填
+    *   `Google Maps Grounding` 個人偏好推薦與既有「換一批／更適合工作」流程整合
+    *   `Codex Luna` 從規格拆解、跨模組實作、測試到 Cloud Run 部署的協作開發
+*   **關鍵亮點：**
+    *   **推薦卡直接變成行程入口**：每張咖啡廳卡片都有「安排喝咖啡時間」按鈕，點擊後由 LINE 原生介面完成日期與時間選擇，降低輸入歧義。
+    *   **用短資料找回完整店家**：Postback 只攜帶版本、動作、短期 session ID 和店家編號；完整店名、座標與推薦內容保存在 Firestore，避免把資料塞進按鈕或暴露在訊息中。
+    *   **過期、冒用與錯店都有防護**：後端會驗證 session 有效期限、LINE userId、對話來源、店家編號與日期格式，避免舊按鈕或群組中的其他人建立錯誤行程。
+    *   **台北時間正確進入 Calendar**：LINE 回傳的日期字串沒有時區，後端明確以台北時間解讀，再產生 Google Calendar 預填連結，避免常見的八小時偏移。
+    *   **Codex Luna 的一次實戰**：這次任務的完成條件清楚、可以逐步測試，適合用 Luna 快速完成；實作仍搭配單元測試、health check、LINE Webhook Verify 與手機端完整流程驗證。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
@@ -415,7 +440,7 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 | **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
 | **資訊安全 (Security)** | OIDC Task Authentication, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, @line/bot-sdk, @google/genai |
-| **輔助開發 (AI Copilot)** | Codex Sol / Terra, Cursor, ChatGPT, Claude |
+| **輔助開發 (AI Copilot)** | Codex Sol / Terra / Luna, Cursor, ChatGPT, Claude |
 
 ---
 
