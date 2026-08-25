@@ -17,9 +17,9 @@ gantt
     section LINE Bots
     Echo Bot      :p1, 2026-05-15, 6d
     AI Bot        :p2, 2026-05-25, 6d
-    Memory Bot    :p3, 2026-06-02, 6d
+    Memory        :p3, 2026-06-02, 6d
     Quick Reply   :p4, 2026-06-08, 6d
-    Flex Message  :p5, 2026-06-14, 6d
+    Flex          :p5, 2026-06-14, 6d
     Icon Switch   :p6, 2026-06-20, 6d
     Rich Menu     :p8, 2026-06-24, 6d
     Loading Bot   :p9, 2026-06-30, 6d
