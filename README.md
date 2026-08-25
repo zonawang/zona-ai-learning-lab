@@ -32,6 +32,7 @@ gantt
     Reminder      :p16, 2026-08-22, 6d
     Companion     :active, p17, 2026-08-23, 6d
     Picker        :p18, 2026-08-24, 6d
+    Rich Menu     :p19, 2026-08-25, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
@@ -428,19 +429,42 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 
 ---
 
+### 📍 ☕ 第十九站：LINE Cafe Rich Menu（替既有功能補上固定操作入口）
+> **入口優化：用 2×2 Rich Menu 把常用功能留在聊天室底部，並透過 Codex App 與 Sol 完成設計、驗證及部署。**
+
+前一站已經讓使用者能從咖啡廳推薦一路選到行程時間，但功能愈來愈多後，也出現了新的問題：如果忘記指令，Bot 再完整也很難使用。這次替 Cafe Bot 補上固定的 Rich Menu，讓「找附近咖啡」、「我的偏好」、「設定偏好」與「使用說明」四個常用入口隨時可見，點一下就能接回既有流程。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-cafe-rich-menu)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/bot-%E5%8A%9F%E8%83%BD%E9%83%BD%E5%81%9A%E5%A5%BD%E4%BA%86-%E6%88%91%E5%8D%BB%E5%BF%98%E4%BA%86%E6%80%8E%E9%BA%BC%E7%94%A8-%E7%94%A8-codex-app-%E5%92%8C-sol-%E6%9B%BF-line-cafe-bot-%E8%A3%9C%E4%B8%8A-rich-menu-b330f837ca13)
+*   **核心技術：**
+    *   `LINE Messaging API` Rich Menu 建立、圖片上傳與預設選單設定
+    *   `2×2 Rich Menu` 點擊區域與既有文字指令串接
+    *   `SVG` 可維護版面與 `@resvg/resvg-js` 產生 2500×1686 PNG
+    *   `Node.js CLI` 建立、查詢、上傳、設為預設與刪除選單
+    *   `Codex App + Sol` 從視覺預覽、程式實作、安全檢查到正式部署的協作開發
+*   **關鍵亮點：**
+    *   **不必記指令也找得到功能**：四個按鈕會送出既有 Bot 已能理解的文字，不需要改寫原本的推薦、偏好記憶與說明流程。
+    *   **設計稿與成品可以重複產生**：保留 SVG 作為可維護來源，再自動輸出符合 LINE 尺寸的 PNG，並在部署前檢查圖片是否超過 1 MB。
+    *   **部署失敗不會破壞現有選單**：若圖片上傳或預設設定失敗，流程會清除未完成的新選單，同時保留原本的預設選單，降低正式更新風險。
+    *   **把相依套件安全納入取捨**：圖片轉換改用 `@resvg/resvg-js`，避開原方案的相依套件風險，也處理 npm cache 權限問題，讓專案可穩定安裝與執行。
+    *   **Codex App 讓視覺問題更早被看見**：除了終端機中的程式與測試，也能直接預覽 Rich Menu 圖片，實際抓到圖示與文字重疊，調整後再部署；Sol 則適合處理這次橫跨 UI、API、安全與部署的完整任務。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API (Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Default Rich Menu Deployment / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2×2 / 2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding), Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
 | **資訊安全 (Security)** | OIDC Task Authentication, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Exactly-Once Deduplication (雙重快取去重) |
-| **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, @line/bot-sdk, @google/genai |
-| **輔助開發 (AI Copilot)** | Codex Sol / Terra / Luna, Cursor, ChatGPT, Claude |
+| **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, SVG / PNG, @resvg/resvg-js, @line/bot-sdk, @google/genai |
+| **輔助開發 (AI Copilot)** | Codex App + Sol / Terra / Luna, Cursor, ChatGPT, Claude |
 
 ---
 
