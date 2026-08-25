@@ -31,7 +31,7 @@ gantt
     Agent         :p15, 2026-08-20, 6d
     Reminder      :p16, 2026-08-22, 6d
     Companion     :active, p17, 2026-08-23, 6d
-    Datetime Picker :p18, 2026-08-24, 6d
+    Picker        :p18, 2026-08-24, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
