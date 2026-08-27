@@ -2,6 +2,10 @@
 
 歡迎來到我的 AI 探索與實作實驗室！這裡記錄了我與 AI 助理（Google Antigravity、Codex 等）攜手合作，從零開始打造、升級雲端應用程式的精彩歷程。
 
+## ✍️ 專題文章
+
+- [不是越強越好：我用 Codex Sol、Terra、Luna 做完四次實作後，學會先看「任務的形狀」](codex-sol-terra-luna.md)
+
 ---
 
 ## 📅 專案進化歷程時間軸 (Chronological Project Timeline)
