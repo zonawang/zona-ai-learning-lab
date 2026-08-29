@@ -5,6 +5,7 @@
 ## ✍️ 專題文章
 
 - [不是越強越好：我用 Codex Sol、Terra、Luna 做完四次實作後，學會先看「任務的形狀」](codex-sol-terra-luna.md)
+- [Codex CLI 和 App 該怎麼選？從只看終端輸出，到真正看見成品](codex-cli-vs-app.md)
 
 ---
 
