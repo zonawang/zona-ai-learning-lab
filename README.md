@@ -38,7 +38,8 @@ gantt
     Companion     :p17, 2026-08-23, 6d
     Picker        :p18, 2026-08-24, 6d
     Rich Menu     :p19, 2026-08-25, 6d
-    Wishlist      :active, p20, 2026-09-01, 6d
+    Wishlist      :p20, 2026-09-01, 6d
+    Follow-up     :active, p21, 2026-09-01, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
@@ -481,6 +482,29 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 
 ---
 
+### 📍 🔔 第二十一站：LINE Cafe Follow-up（喝完咖啡後主動回來問體驗）
+> **旅程閉環：Bot 不只在出發前提醒，而是在造訪結束後主動回訪，把一次推薦接成可以累積的咖啡足跡。**
+
+先前的 Reminder Agent 解決的是「別忘了出發」，這次處理的是另一個常見問題：喝完咖啡後，總是忘記回來評分。使用者透過 Datetime Picker 安排行程時，Bot 會建立 planned visit，並交給 Cloud Tasks 在造訪後主動推送 LINE 訊息。使用者可以直接開始評分，也可以選擇「這次沒去」結束流程，讓找店、安排時間、實際造訪與留下紀錄真正串在一起。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-cafe-follow-up)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E5%96%9D%E5%AE%8C%E5%92%96%E5%95%A1%E7%B8%BD%E6%98%AF%E5%BF%98%E8%A8%98%E8%A9%95%E5%88%86-%E6%88%91%E8%AE%93-line-bot-%E4%B8%BB%E5%8B%95%E5%9B%9E%E4%BE%86%E6%8F%90%E9%86%92-d73334e1b38d)
+*   **核心技術：**
+    *   `Google Cloud Tasks` 安排造訪後回訪、失敗重試與 Cloud Run 喚醒
+    *   `Cloud Firestore` Planned Visit 狀態、delivery lease 與 TTL
+    *   `LINE Push Message` 主動發送「開始評分／這次沒去」操作
+    *   `LINE Postback Action` 驗證使用者與 conversation 後接回評分流程
+    *   `LINE Datetime Picker` 與既有咖啡足跡功能整合
+*   **關鍵亮點：**
+    *   **提醒時機從出發前延伸到造訪後**：排定咖啡時間後，系統預設在行程開始一小時後回訪，主動詢問這次體驗，不必等使用者自己想起評分指令。
+    *   **Cloud Run 關機也不會忘記回來**：排程交給 Cloud Tasks 保存，而不是留在應用程式記憶體；時間到了會重新喚醒服務並透過 LINE Push Message 聯絡使用者。
+    *   **重試不會變成重複打擾**：固定 Task ID、Firestore 狀態檢查與五分鐘 delivery lease 共同處理重送；推播失敗會回到可重試狀態，完成後再次收到相同任務則直接略過。
+    *   **回覆只能操作自己的行程**：Reminder endpoint 使用密鑰保護，Postback 還會驗證 LINE userId 與原 conversation，避免其他人操作不屬於自己的回訪。
+    *   **咖啡足跡保留真正的造訪日期**：開始評分後會沿用原本安排的日期，而不是把填寫評分的當下誤記成喝咖啡的時間。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
@@ -490,8 +514,8 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 | **通訊渠道 (Messaging)** | LINE Messaging API (Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Default Rich Menu Deployment / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2×2 / 2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding), Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
-| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
-| **資訊安全 (Security)** | OIDC Task Authentication, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Exactly-Once Deduplication (雙重快取去重) |
+| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資訊安全 (Security)** | OIDC Task Authentication, Internal Task Secret, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, SVG / PNG, @resvg/resvg-js, @line/bot-sdk, @google/genai |
 | **輔助開發 (AI Copilot)** | Codex App + Sol / Terra / Luna, Cursor, ChatGPT, Claude |
 
