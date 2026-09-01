@@ -20,29 +20,29 @@ gantt
     axisFormat %m/%d
 
     section LINE Bots
-    Echo Bot      :p1, 2026-05-15, 6d
-    AI Bot        :p2, 2026-05-25, 6d
-    Memory        :p3, 2026-06-02, 6d
-    Quick Reply   :p4, 2026-06-08, 6d
-    Flex          :p5, 2026-06-14, 6d
-    Icon Switch   :p6, 2026-06-20, 6d
-    Rich Menu     :p8, 2026-06-24, 6d
-    Loading Bot   :p9, 2026-06-30, 6d
-    Date Picker   :p10, 2026-07-01, 6d
-    Camera        :p11, 2026-08-01, 6d
-    Cafe Bot      :p12, 2026-08-11, 6d
-    Maps Bot      :p13, 2026-08-12, 6d
-    Postback      :p14, 2026-08-17, 6d
-    Agent         :p15, 2026-08-20, 6d
-    Reminder      :p16, 2026-08-22, 6d
-    Companion     :p17, 2026-08-23, 6d
-    Picker        :p18, 2026-08-24, 6d
-    Rich Menu     :p19, 2026-08-25, 6d
-    Wishlist      :p20, 2026-09-01, 6d
-    Follow-up     :active, p21, 2026-09-01, 6d
+    Echo Bot      :p1, 2026-05-15, 12d
+    AI Bot        :p2, 2026-05-25, 12d
+    Memory        :p3, 2026-06-02, 12d
+    Quick Reply   :p4, 2026-06-08, 12d
+    Flex          :p5, 2026-06-14, 12d
+    Icon Switch   :p6, 2026-06-20, 12d
+    Rich Menu     :p8, 2026-06-24, 12d
+    Loading Bot   :p9, 2026-06-30, 12d
+    Date Picker   :p10, 2026-07-01, 12d
+    Camera        :p11, 2026-08-01, 12d
+    Cafe Bot      :p12, 2026-08-11, 12d
+    Maps Bot      :p13, 2026-08-12, 12d
+    Postback      :p14, 2026-08-17, 12d
+    Agent         :p15, 2026-08-20, 12d
+    Reminder      :p16, 2026-08-22, 12d
+    Companion     :p17, 2026-08-23, 12d
+    Picker        :p18, 2026-08-24, 12d
+    Rich Menu     :p19, 2026-08-25, 12d
+    Wishlist      :p20, 2026-09-01, 12d
+    Follow-up     :active, p21, 2026-09-01, 12d
 
     section Other Projects
-    Tokyo Trip    :p7, 2026-06-22, 6d
+    Tokyo Trip    :p7, 2026-06-22, 12d
 ```
 
 ---
