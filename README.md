@@ -35,9 +35,10 @@ gantt
     Postback      :p14, 2026-08-17, 6d
     Agent         :p15, 2026-08-20, 6d
     Reminder      :p16, 2026-08-22, 6d
-    Companion     :active, p17, 2026-08-23, 6d
+    Companion     :p17, 2026-08-23, 6d
     Picker        :p18, 2026-08-24, 6d
     Rich Menu     :p19, 2026-08-25, 6d
+    Wishlist      :active, p20, 2026-09-01, 6d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 6d
@@ -457,6 +458,29 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 
 ---
 
+### 📍 💛 第二十站：LINE Cafe Wishlist（把收藏優化成真正的想去清單）
+> **體驗優化：不再要求 Bot 從一句「收藏第二間」猜回前文，而是把店家資料、收藏按鈕與清單入口接成一條完整流程。**
+
+先前的 Cafe Action Agent 已經用 Gemini Function Calling 實作過收藏，但實際輸入「收藏第二間」時，Bot 不一定能找回上方那批推薦。原因不是模型看不懂「第二間」，而是每次 Webhook 都是獨立請求；如果沒有把推薦結果保存成可查詢的 Context，後端就不知道「第二間」究竟是哪一家。這次不是重做收藏，而是將它優化為可長期使用的「想去清單」：推薦卡直接收藏、資料庫避免重複、清單可查看與移除，也能從 Rich Menu 隨時進入。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-cafe-wishlist)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/line-bot-%E7%82%BA%E4%BB%80%E9%BA%BC%E4%B8%8D%E8%A8%98%E5%BE%97-%E7%AC%AC%E4%BA%8C%E9%96%93-%E6%88%91%E6%8A%8A%E6%94%B6%E8%97%8F%E5%8A%9F%E8%83%BD%E5%84%AA%E5%8C%96%E6%88%90%E7%9C%9F%E6%AD%A3%E7%9A%84%E6%83%B3%E5%8E%BB%E6%B8%85%E5%96%AE-9a4823fda92f)
+*   **核心技術：**
+    *   `LINE Postback Action` 從推薦卡直接新增或移除店家
+    *   `Cloud Firestore` 依使用者隔離的想去清單與穩定 ID 去重
+    *   `LINE Flex Message` 顯示店家、Google Maps、安排時間與移除操作
+    *   `Google Maps URI` 產生穩定店家識別碼，避免同一家店重複收藏
+    *   `LINE Messaging API Rich Menu` 五格入口與既有文字指令串接
+*   **關鍵亮點：**
+    *   **已知操作不必再交給模型猜**：推薦卡上的收藏按鈕會直接送出結構化 Postback，由後端依 session 與店家編號找到原始資料；Gemini 仍適合理解自由輸入，但明確的按鈕操作走更短、更穩定的路徑。
+    *   **同一家店只保留一份**：以 Google Maps URI 衍生穩定 ID，即使店家在不同次搜尋中再次出現，也不會在清單中累積重複項目。
+    *   **收藏不再只是資料庫裡的一筆資料**：輸入「我的想去清單」就會收到可操作的 Flex 卡片，可以開啟地圖、安排喝咖啡時間或直接移除。
+    *   **想去清單接回既有行程流程**：從清單安排時間時，會沿用原本的 Datetime Picker 與 Google Calendar 流程，不必建立另一套互不相通的功能。
+    *   **Rich Menu 從四格擴充為五格**：新增「想去清單」固定入口，和附近咖啡、偏好、設定偏好、使用說明並列，使用者不必記住文字指令。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
@@ -466,7 +490,7 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 | **通訊渠道 (Messaging)** | LINE Messaging API (Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Default Rich Menu Deployment / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2×2 / 2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding), Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
-| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
 | **資訊安全 (Security)** | OIDC Task Authentication, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, SVG / PNG, @resvg/resvg-js, @line/bot-sdk, @google/genai |
 | **輔助開發 (AI Copilot)** | Codex App + Sol / Terra / Luna, Cursor, ChatGPT, Claude |
