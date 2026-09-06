@@ -39,7 +39,8 @@ gantt
     Picker        :p18, 2026-08-24, 12d
     Rich Menu     :p19, 2026-08-25, 12d
     Wishlist      :p20, 2026-09-01, 12d
-    Follow-up     :active, p21, 2026-09-01, 12d
+    Follow-up     :p21, 2026-09-01, 12d
+    Group Vote    :active, p22, 2026-09-05, 12d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 12d
@@ -505,17 +506,40 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 
 ---
 
+### 📍 🗳️ 第二十二站：LINE Cafe Group Planner（把「我都可以」變成群組投票）
+> **共同決定：把 Bot 拉進 LINE 群組，從分享位置、加入候選到投票截止，讓約咖啡不再卡在「所以要去哪？」。**
+
+朋友約喝咖啡時，最難的常常不是找不到店，而是每個人都說「我都可以」。這次把原本的一對一 Cafe Bot 延伸到 LINE 群組：成員傳送聚會位置後，Bot 會推薦附近店家；大家可加入最多五間候選、各投一票並隨時改票，最後由發起人截止並公布最高票。實機測試還發現 Loading Animation 不支援群組，以及舊 webhook 仍回傳個人版卡片，於是進一步補上文字進度、群組專用卡片和可驗證的部署切換。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-cafe-group-planner)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E5%A4%A7%E5%AE%B6%E9%83%BD%E8%AA%AA-%E9%83%BD%E5%8F%AF%E4%BB%A5-%E7%B5%90%E6%9E%9C%E6%9C%80%E9%9B%A3%E7%9A%84%E6%98%AF%E6%B1%BA%E5%AE%9A%E5%8E%BB%E5%93%AA-%E6%88%91%E6%8A%8A-line-bot-%E6%8B%89%E9%80%B2%E7%BE%A4%E7%B5%84%E4%B8%80%E8%B5%B7%E6%8A%95%E7%A5%A8-0bef3b593b47?postPublishedType=initial)
+*   **核心技術：**
+    *   `LINE Group / Join Webhook Events` 以 `groupId` 管理共同狀態、以 `userId` 辨識發起人與投票者
+    *   `LINE Postback Action + Flex Message + Quick Reply` 候選加入、投票、改票、查看票數與截止流程
+    *   `Cloud Firestore Transaction` 群組 Plan、候選店、每人單一有效票與 24 小時效期
+    *   `LINE Loading Animation Scope` 一對一聊天室使用原生動畫，群組改以即時文字訊息回報搜尋進度
+    *   `Cloud Run + IAM + Webhook Verify` 獨立服務帳號、health check、LINE 簽章測試與安全切換
+*   **關鍵亮點：**
+    *   **直接傳位置也能開始，不必背通關密語**：群組輸入「一起選咖啡廳」或直接傳送位置都可以；系統會自動建立或沿用目前投票，不會因另一位成員再次傳位置而洗掉候選與票數。
+    *   **一人一票，但可以改變心意**：票數保存的是每位成員目前選擇的候選，而不是每按一次就累加；再次投票會更新原選擇，避免重複灌票。
+    *   **群組卡片只留下現在需要的動作**：搜尋結果在群組模式下隱藏個人行程、造訪紀錄與想去清單，只顯示「加入群組候選」和地圖，並提供清楚的三步操作提示與「查看並投票」入口。
+    *   **舊按鈕與跨群組操作不會污染票數**：每輪使用獨立 `planId`，後端同時檢查群組、使用者、狀態、期限與候選；過期、已截止或上一輪的 Postback 都會被拒絕。
+    *   **實機問題一路追到真正的線上版本**：Codex 從 LINE Loading API 的一對一限制、缺少 `groupPlanId` 的程式分支，查到正式 webhook 仍指向上一站；修正後建立獨立 Cloud Run 服務，以 66 項測試、簽章 request 與 LINE Verify `200` 確認成功才切換。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API (Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Default Rich Menu Deployment / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2×2 / 2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Group & Join Events / Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Default Rich Menu Deployment / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2×2 / 2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
-| **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding), Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
-| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
-| **資訊安全 (Security)** | OIDC Task Authentication, Internal Task Secret, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Exactly-Once Deduplication (雙重快取去重) |
+| **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding / Health Check / Webhook Verify & Rollback), Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
+| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / Group Plan、候選與單一有效票 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資訊安全 (Security)** | OIDC Task Authentication, Internal Task Secret, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Plan ID 與群組／使用者綁定, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, SVG / PNG, @resvg/resvg-js, @line/bot-sdk, @google/genai |
 | **輔助開發 (AI Copilot)** | Codex App + Sol / Terra / Luna, Cursor, ChatGPT, Claude |
 
