@@ -40,7 +40,8 @@ gantt
     Rich Menu     :p19, 2026-08-25, 12d
     Wishlist      :p20, 2026-09-01, 12d
     Follow-up     :p21, 2026-09-01, 12d
-    Group Vote    :active, p22, 2026-09-05, 12d
+    Group Vote    :p22, 2026-09-05, 12d
+    Group Time    :active, p23, 2026-09-07, 12d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 12d
@@ -529,6 +530,29 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 
 ---
 
+### 📍 🗓️ 第二十三站：LINE Cafe Group Scheduler（店選好後，繼續一起選時間）
+> **行程接力：從群組選店結果直接進入時間提案、投票、決選與提醒，把「去哪裡」真正接到「什麼時候去」。**
+
+咖啡廳選出來後，朋友還是可能卡在「所以哪一天有空？」。這次延續 Group Planner，當店家出現單一最高票時，Bot 會提供「接著一起選時間」；群組成員都可以提出候選，每人投一票並可改票，最後由原發起人截止或處理平手。實際操作後又發現兩個流程斷點：非發起人誤按截止後，發起人沒有接手入口；新增第一個時間後，畫面也沒有繼續提案的按鈕。修正後，Bot 不只知道規則，也會把正確的下一步留在群組面前。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-cafe-group-scheduler)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E5%92%96%E5%95%A1%E5%BB%B3%E9%81%B8%E5%A5%BD%E4%BA%86-%E5%A4%A7%E5%AE%B6%E9%82%84%E6%98%AF%E7%B4%84%E4%B8%8D%E6%88%90-%E6%88%91%E8%AE%93-line-bot-%E7%B9%BC%E7%BA%8C%E5%B9%AB%E7%BE%A4%E7%B5%84%E9%81%B8%E6%99%82%E9%96%93-0d3306f8af7b?postPublishedType=initial)
+*   **核心技術：**
+    *   `LINE Datetime Picker + Postback Params` 以 schedule ID 綁定投票輪次，並接收成員選擇的日期時間
+    *   `Cloud Firestore Transaction` 保存候選時間、每位成員的單一有效票與 `collecting → tie_break → confirmed` 狀態
+    *   `LINE Flex Message + Dynamic Quick Reply` 顯示時間輪播、票數、截止操作，並依候選上限動態保留提案入口
+    *   `Google Calendar URL + Google Maps URI` 將最終店家與時間轉成每位成員可自行加入的 90 分鐘行程
+    *   `Google Cloud Tasks + LINE Push Message` 在聚會前提醒群組，並以固定 Task ID 與 Firestore delivery state 避免重複推播
+*   **關鍵亮點：**
+    *   **選店和選時間是同一條旅程**：只有咖啡廳投票出現至少一票的單一勝者，才能直接帶著店家進入時間投票，不必重新搜尋或輸入店名。
+    *   **大家都能提時間，但候選不會無限增加**：每輪最多五個候選，範圍限定在 10 分鐘後到 60 天內；未滿五個前，每次新增後都會繼續顯示「提出候選時間」。
+    *   **一人一票可改票，平手有清楚收尾**：再次投票會更新原選擇，不會重複累加；最高票平手時只保留領先選項，交由原發起人決選。
+    *   **權限錯誤不再讓全群卡住**：非發起人按截止時，Bot 會拒絕操作，同時重新顯示最新票數與截止按鈕，讓真正的發起人直接接手。
+    *   **Codex 從生活化描述追到程式斷點**：先讀取上一站結構，將「一起選時間」拆成 groupId、scheduleId、creatorId、userId 與狀態規則；實機回報問題後，再從 postback、handler、store 追到訊息與 Quick Reply，補回兩條消失的使用路徑。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
@@ -538,8 +562,8 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 | **通訊渠道 (Messaging)** | LINE Messaging API (Group & Join Events / Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Default Rich Menu Deployment / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2×2 / 2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding / Health Check / Webhook Verify & Rollback), Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
-| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / Group Plan、候選與單一有效票 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
-| **資訊安全 (Security)** | OIDC Task Authentication, Internal Task Secret, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Plan ID 與群組／使用者綁定, Exactly-Once Deduplication (雙重快取去重) |
+| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / Group Plan、Group Schedule、候選與單一有效票 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資訊安全 (Security)** | OIDC Task Authentication, Internal Task Secret, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Plan / Schedule ID 與群組／使用者綁定, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, SVG / PNG, @resvg/resvg-js, @line/bot-sdk, @google/genai |
 | **輔助開發 (AI Copilot)** | Codex App + Sol / Terra / Luna, Cursor, ChatGPT, Claude |
 
