@@ -41,7 +41,8 @@ gantt
     Wishlist      :p20, 2026-09-01, 12d
     Follow-up     :p21, 2026-09-01, 12d
     Group Vote    :p22, 2026-09-05, 12d
-    Group Time    :active, p23, 2026-09-07, 12d
+    Group Time    :p23, 2026-09-07, 12d
+    Passport      :active, p24, 2026-09-09, 12d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 12d
@@ -553,6 +554,31 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 
 ---
 
+### 📍 🛂 第二十四站：LINE Cafe Passport（把一路累積的咖啡足跡收進一本護照）
+> **旅程收束：不要求使用者重新打卡，而是整理既有足跡、評分、標籤與想去清單，產生可回顧、可切換期間也可分享的個人咖啡護照。**
+
+LINE Cafe Bot 已經陪使用者找店、收藏、安排時間、完成造訪並留下感受，最後一個功能不再向外增加新的流程，而是回頭讀懂前面累積的資料。輸入「我的咖啡護照」、「本月咖啡護照」或「今年咖啡護照」，Bot 會整理造訪次數、不同店家、平均評分、五星體驗、常見標籤、最常造訪店家與收藏後實際造訪等統計，再由 Gemini 根據已確認的數字寫成簡短回顧。實機測試時，Gemini 摘要一度只剩半句；Codex 從 Flex Message 一路追查到輸出 token、thinking budget 與 Firestore 快取，最後連舊的截斷內容也一起正確失效。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-cafe-passport)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/line-cafe-bot-%E6%97%85%E7%A8%8B%E5%B0%BE%E8%81%B2-%E6%88%91%E6%8A%8A%E4%B8%80%E8%B7%AF%E7%B4%AF%E7%A9%8D%E7%9A%84%E8%B6%B3%E8%B7%A1%E5%81%9A%E6%88%90%E4%B8%80%E6%9C%AC%E5%92%96%E5%95%A1%E8%AD%B7%E7%85%A7-b460ad326706)
+*   **核心技術：**
+    *   `Cloud Firestore Aggregation` 彙整咖啡足跡、評分標籤與目前想去清單，不另建重複打卡流程
+    *   `Asia/Taipei Date Boundaries` 正確切分全部、本月與今年資料，避免月底或跨年紀錄落入錯誤期間
+    *   `Stable Google Maps URI Identity` 優先以標準化 Maps URI 判斷同一家店，區分造訪次數與不重複店家數
+    *   `Gemini 2.5 Flash Structured Recap` 僅根據程式算好的統計撰寫兩句回顧，並提供 deterministic fallback
+    *   `LINE Flex Message + Share Target Picker` 將護照統計做成可分享卡片，同時移除 owner ID 等個人識別資訊
+    *   `Firestore Fingerprint Cache` 以統計內容與摘要版本判斷快取，資料未變時避免重複呼叫 Gemini
+*   **關鍵亮點：**
+    *   **以前留下的資料直接成為護照**：使用者不必重新打卡，已完成的造訪、評分與標籤會自動進入統計；完成新足跡後也能直接開啟護照。
+    *   **數字由程式計算，Gemini 只負責說人話**：次數、平均分數、熱門標籤與店家排名都先確定，再交給模型改寫；Prompt 禁止推測個性、消費金額或未提供的地點。
+    *   **「收藏後已造訪」不假裝是終身轉換率**：只計算目前仍在清單、Maps URI 相同且造訪時間晚於收藏時間的店家，讓名稱與現有資料能力一致。
+    *   **半句回顧不是畫面截字**：Codex 先確認卡片已開啟換行且沒有行數限制，再追到 Gemini thinking 占用輸出預算；調高 token 並將短文任務的 thinking budget 設為 0，讓句子完整結束。
+    *   **修好生成設定，也要處理舊快取**：第一次產生的半句已存進 Firestore，單改模型設定仍會讀到舊內容；因此在 fingerprint 加入摘要版本，讓舊快取自動失效並重新生成。
+    *   **分享的是成果，不是使用者身分**：分享卡保留期間與統計，不包含 LINE user ID；即使在群組輸入指令，也只會讀取發出指令者自己的紀錄。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
@@ -560,10 +586,10 @@ Cafe Bot 已經能透過 Google Maps Grounding 找店，也能沿用上一輪位
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
 | **通訊渠道 (Messaging)** | LINE Messaging API (Group & Join Events / Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Default Rich Menu Deployment / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2×2 / 2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
-| **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
+| **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Gemini Structured Recap (統計約束摘要 / Thinking Budget 控制 / Deterministic Fallback), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding / Health Check / Webhook Verify & Rollback), Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
-| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / Group Plan、Group Schedule、候選與單一有效票 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
-| **資訊安全 (Security)** | OIDC Task Authentication, Internal Task Secret, Application Default Credentials (ADC), IAM, Secretless Auth, Pending Action 二次確認, Plan / Schedule ID 與群組／使用者綁定, Exactly-Once Deduplication (雙重快取去重) |
+| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / 咖啡足跡統計 / Passport Summary Fingerprint Cache / Group Plan、Group Schedule、候選與單一有效票 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資訊安全 (Security)** | OIDC Task Authentication, Internal Task Secret, Application Default Credentials (ADC), IAM, Secretless Auth, 分享卡個資移除, Pending Action 二次確認, Plan / Schedule ID 與群組／使用者綁定, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, SVG / PNG, @resvg/resvg-js, @line/bot-sdk, @google/genai |
 | **輔助開發 (AI Copilot)** | Codex App + Sol / Terra / Luna, Cursor, ChatGPT, Claude |
 
