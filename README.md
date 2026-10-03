@@ -43,11 +43,12 @@ gantt
     Group Vote    :p22, 2026-09-05, 12d
     Group Time    :p23, 2026-09-07, 12d
     Passport      :active, p24, 2026-09-09, 12d
-    Visit Bot     :milestone, p25, 2026-10-01, 0d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 12d
 ```
+
+**2026/10/01 新增：** LINE Visit Bot（企業參訪小幫手）。完整介紹見下方第二十五站。
 
 ---
 
