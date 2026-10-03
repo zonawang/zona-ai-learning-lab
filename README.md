@@ -45,6 +45,7 @@ gantt
     Group Time    :p23, 2026-09-07, 12d
     Passport      :active, p24, 2026-09-09, 12d
     Visit Bot     :p25, 2026-10-01, 12d
+    Group Memory  :p26, 2026-10-03, 12d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 12d
@@ -602,6 +603,30 @@ LINE Cafe Bot 已經陪使用者找店、收藏、安排時間、完成造訪並
 
 ---
 
+### 📍 🧠 第二十六站：LINE Visit Bot Group Memory（讓每個參訪群組都有自己的記憶）
+> **群組記憶：同一隻 Bot 進入不同參訪群組後，能分別記住各場活動資訊，並用自然問法找出正確答案。**
+
+前一版 Bot 可以回答通用的行前問題，但每一場企業參訪的集合時間、地點與注意事項都不同。這次替它接上 Firestore，使用 LINE `groupId` 區分各個群組，讓主辦人直接在群組設定這一場的資訊。除了活動名稱、日期與集合地點等常用欄位，也能自由新增「遊覽車停車地點」、「報到方式」或任何臨時需要的內容。其他成員不必記住欄位名稱，可以直接問「遊覽車可以停哪裡？」；文字規則找不到時，Gemini 會協助從現有欄位中挑出最相關的一項，再由程式讀取 Firestore 裡的原始資料回答。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-visit-bot-group-memory)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E8%AE%93%E6%AF%8F%E5%80%8B%E5%8F%83%E8%A8%AA%E7%BE%A4%E7%B5%84%E9%83%BD%E6%9C%89%E8%87%AA%E5%B7%B1%E7%9A%84%E8%A8%98%E6%86%B6-%E6%88%91%E6%9B%BF-line-bot-%E5%8A%A0%E4%B8%8A-firestore-c52061a2a0a7)
+*   **核心技術：**
+    *   `Cloud Firestore` 以 LINE `groupId`／`roomId` 分開保存每個參訪群組的活動資料
+    *   `Vertex AI Gemini 2.5 Flash` 在文字規則無法判斷時，從既有欄位中選出最符合問題的一項
+    *   `LINE Messaging API` 群組提及辨識、Webhook 簽章驗證與 Reply API
+    *   `Google Cloud Run + Secret Manager + IAM` 執行服務、保管密鑰並限制雲端資源權限
+    *   `GitHub Actions` 在程式推送到 `main` 後自動建立容器並部署新版
+*   **關鍵亮點：**
+    *   **每個群組都有獨立記憶**：資料以群組 ID 分開保存，同一隻 Bot 同時加入多個參訪群組，也不會把不同學校或場次的資訊混在一起。
+    *   **第一位建立資料的人負責管理**：第一位輸入「建立參訪」的成員會成為該群組的資料管理者；只有管理者可以修改，其他成員都能查詢。
+    *   **注意事項不再被固定格式限制**：主辦人可以新增任何自訂欄位，不必把資訊硬塞進預先設計好的幾個分類。
+    *   **自然問法也找得到自訂資料**：系統先用快速、可預期的文字規則比對；規則找不到時，再交給 Gemini 理解「遊覽車可以停哪裡」與「遊覽車停車地點」之間的關係。
+    *   **Gemini 不負責編造活動答案**：模型只能選擇 Firestore 已存在的欄位名稱，真正回覆的內容仍由程式從資料庫讀取；若沒有合適資料，Bot 會有禮貌地請大家稍等 Zona 協助確認。
+    *   **從程式更新到上線自動完成**：Cloud Run 負責接收 LINE 訊息，Secret Manager 保存 Channel secret 與 access token，IAM 限制存取範圍，再由 GitHub Actions 完成後續部署。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
@@ -609,9 +634,9 @@ LINE Cafe Bot 已經陪使用者找店、收藏、安排時間、完成造訪並
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
 | **通訊渠道 (Messaging)** | LINE Messaging API (Group & Join Events / Mention Self Detection / Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Default Rich Menu Deployment / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2×2 / 2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
-| **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Gemini Structured Recap (統計約束摘要 / Thinking Budget 控制 / Deterministic Fallback), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
+| **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Gemini Structured Recap (統計約束摘要 / Thinking Budget 控制 / Deterministic Fallback), Vertex AI Gemini Semantic Field Routing (只選擇既有欄位), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
 | **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding / Health Check / Webhook Verify & Rollback), GitHub Actions, Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
-| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / 咖啡足跡統計 / Passport Summary Fingerprint Cache / Group Plan、Group Schedule、候選與單一有效票 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), `faq.json` 靜態問答, ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資料記憶 (Database/Memory)**| Cloud Firestore (參訪群組獨立記憶與自訂欄位 / 短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / 咖啡足跡統計 / Passport Summary Fingerprint Cache / Group Plan、Group Schedule、候選與單一有效票 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), `faq.json` 靜態問答, ChineseFirestoreMemoryService (中文分詞檢索) |
 | **資訊安全 (Security)** | OIDC Task Authentication, Internal Task Secret, Application Default Credentials (ADC), IAM, Secret Manager, Secretless Auth, 分享卡個資移除, Pending Action 二次確認, Plan / Schedule ID 與群組／使用者綁定, Exactly-Once Deduplication (雙重快取去重) |
 | **開發語言與環境** | Python 3.9+, Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, SVG / PNG, @resvg/resvg-js, @line/bot-sdk, @google/genai |
 | **輔助開發 (AI Copilot)** | Codex App + Sol / Terra / Luna, Cursor, ChatGPT, Claude |
