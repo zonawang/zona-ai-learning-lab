@@ -14,6 +14,7 @@
 我們採用漸進式學習與開發，從最基礎的串接驗證，逐步演進至多模態大腦與高安全性雲端部署。以下是專案的演進軌跡：
 
 ```mermaid
+%%{init: {"gantt": {"rightPadding": 180}}}%%
 gantt
     title Project Timeline
     dateFormat YYYY-MM-DD
