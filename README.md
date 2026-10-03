@@ -43,6 +43,7 @@ gantt
     Group Vote    :p22, 2026-09-05, 12d
     Group Time    :p23, 2026-09-07, 12d
     Passport      :active, p24, 2026-09-09, 12d
+    Visit Bot     :milestone, p25, 2026-10-01, 0d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 12d
@@ -579,18 +580,39 @@ LINE Cafe Bot 已經陪使用者找店、收藏、安排時間、完成造訪並
 
 ---
 
+### 📍 🎓 第二十五站：LINE Visit Bot（讓企業參訪資訊更好找的群組小幫手）
+> **新主題：把 LINE Bot 帶進 DevRel 的企業參訪群組，讓學生更容易找到行前常見問題的答案。**
+
+繼水晶 Bot 和咖啡 Bot 之後，這次從我的 DevRel 工作出發。每到年底，都有機會迎接不同學校的同學來公司參訪；當幾場活動同時準備時，我希望學生能方便地確認行前準備與參訪流程，也讓接待團隊把更多時間放在交流和現場體驗。這隻 Bot 在私聊可以直接回答，在群組則只回覆真正 `@` 到它的文字訊息。目前先用固定問答處理通用問題；各場集合時間與地點尚未登錄時，它會明說不知道，請大家以主辦人公告為準。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/line-visit-bot-day1)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E8%AE%93%E4%BC%81%E6%A5%AD%E5%8F%83%E8%A8%AA%E8%B3%87%E8%A8%8A%E6%9B%B4%E5%A5%BD%E6%89%BE-%E6%88%91%E5%81%9A%E4%BA%86%E4%B8%80%E9%9A%BB-line-bot-%E5%B0%8F%E5%B9%AB%E6%89%8B-06124af56590)
+*   **核心技術：**
+    *   `LINE Messaging API Webhook + Reply API` 接收訊息、驗證簽章後回覆原對話
+    *   `LINE mention.mentionees[].isSelf` 辨識群組中是否真的提及 Bot，避免插入一般聊天
+    *   `Python + faq.json` 將問題與關鍵字比對，回覆可自行編輯的固定答案
+    *   `Google Cloud Run + Secret Manager + GitHub Actions` 託管服務、保管 LINE 密鑰並更新版本
+*   **關鍵亮點：**
+    *   **私聊直接問，群組先叫它**：工作群組裡只有透過 LINE 的提及功能選到 Bot，它才會回答文字訊息。
+    *   **先照顧行前常見問題**：可回答參訪準備、常見流程與提問建議；輸入「功能」就能看到目前的回答範圍。
+    *   **活動資訊不靠猜**：尚未登錄的集合時間與地點會明確說明，避免把看似合理的答案當成正式通知。
+    *   **問答內容容易維護**：目前答案放在 `faq.json`，還沒有各群組的活動資料庫或長期記憶；要調整通用回答可以先改問答清單。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
 
 | 領域 | 採用技術與服務 |
 | :--- | :--- |
-| **通訊渠道 (Messaging)** | LINE Messaging API (Group & Join Events / Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Default Rich Menu Deployment / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2×2 / 2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
+| **通訊渠道 (Messaging)** | LINE Messaging API (Group & Join Events / Mention Self Detection / Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Default Rich Menu Deployment / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2×2 / 2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Gemini Structured Recap (統計約束摘要 / Thinking Budget 控制 / Deterministic Fallback), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
-| **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding / Health Check / Webhook Verify & Rollback), Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
-| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / 咖啡足跡統計 / Passport Summary Fingerprint Cache / Group Plan、Group Schedule、候選與單一有效票 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), ChineseFirestoreMemoryService (中文分詞檢索) |
-| **資訊安全 (Security)** | OIDC Task Authentication, Internal Task Secret, Application Default Credentials (ADC), IAM, Secretless Auth, 分享卡個資移除, Pending Action 二次確認, Plan / Schedule ID 與群組／使用者綁定, Exactly-Once Deduplication (雙重快取去重) |
-| **開發語言與環境** | Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, SVG / PNG, @resvg/resvg-js, @line/bot-sdk, @google/genai |
+| **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding / Health Check / Webhook Verify & Rollback), GitHub Actions, Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
+| **資料記憶 (Database/Memory)**| Cloud Firestore (短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / 咖啡足跡統計 / Passport Summary Fingerprint Cache / Group Plan、Group Schedule、候選與單一有效票 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), `faq.json` 靜態問答, ChineseFirestoreMemoryService (中文分詞檢索) |
+| **資訊安全 (Security)** | OIDC Task Authentication, Internal Task Secret, Application Default Credentials (ADC), IAM, Secret Manager, Secretless Auth, 分享卡個資移除, Pending Action 二次確認, Plan / Schedule ID 與群組／使用者綁定, Exactly-Once Deduplication (雙重快取去重) |
+| **開發語言與環境** | Python 3.9+, Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, SVG / PNG, @resvg/resvg-js, @line/bot-sdk, @google/genai |
 | **輔助開發 (AI Copilot)** | Codex App + Sol / Terra / Luna, Cursor, ChatGPT, Claude |
 
 ---
