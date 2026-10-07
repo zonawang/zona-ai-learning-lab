@@ -6,6 +6,7 @@
 
 - [不是越強越好：我用 Codex Sol、Terra、Luna 做完四次實作後，學會先看「任務的形狀」](codex-sol-terra-luna.md)
 - [Codex CLI 和 App 該怎麼選？從只看終端輸出，到真正看見成品](codex-cli-vs-app.md)
+- [我用 AIDD 做了一個 LINE 午餐 Bot，才發現 AI 開發最難的不是寫程式](https://medium.com/@zonawang/%E6%88%91%E7%94%A8-aidd-%E5%81%9A%E4%BA%86%E4%B8%80%E5%80%8B-line-%E5%8D%88%E9%A4%90-bot-%E6%89%8D%E7%99%BC%E7%8F%BE-ai-%E9%96%8B%E7%99%BC%E6%9C%80%E9%9B%A3%E7%9A%84%E4%B8%8D%E6%98%AF%E5%AF%AB%E7%A8%8B%E5%BC%8F-d5973d6f4d41)
 
 ---
 
@@ -46,6 +47,7 @@ gantt
     Passport      :active, p24, 2026-09-09, 12d
     Visit Bot     :p25, 2026-10-01, 12d
     Group Memory  :p26, 2026-10-03, 12d
+    AIDD Lunch    :milestone, p27, 2026-10-06, 0d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 12d
@@ -627,6 +629,30 @@ LINE Cafe Bot 已經陪使用者找店、收藏、安排時間、完成造訪並
 
 ---
 
+### 📍 🍱 第二十七站：AIDD LINE Lunch Decision Bot（從一句想法到可驗證的午餐推薦 MVP）
+> **開發方式的新嘗試：讓 AI 不只寫程式，也一起釐清需求、設計、測試與交接；人則負責方向、優先級與重要決策。**
+
+2026-10-05 開始，2026-10-06 完成這次 MVP workflow。從「今天中午要吃什麼？」出發，以 **Codex CLI + AI-DLC** 實踐 AIDD（AI-Driven Development）：使用者在 LINE 私訊確認當次位置處理、重傳位置後，Bot 從 Google Places 回傳候選中篩選一公里內的餐廳，提供最多三家不重複推薦、理由與地圖連結。過程也遇到一年歷史需求擴張、PostgreSQL／Lima 環境問題，以及 `.env`／`.DS_Store` 與來源審查範圍的衝突；最後以 **MVP-first / Time-to-MVP** 調整優先級，保留原成果與失敗紀錄，先讓真正的 LINE 核心使用流程跑通。
+
+*   **專案資源：**
+    *   [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/zonawang/aidd-line-bot/tree/mvp-closeout)
+    *   [![Medium Article](https://img.shields.io/badge/Medium-Article-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@zonawang/%E6%88%91%E7%94%A8-aidd-%E5%81%9A%E4%BA%86%E4%B8%80%E5%80%8B-line-%E5%8D%88%E9%A4%90-bot-%E6%89%8D%E7%99%BC%E7%8F%BE-ai-%E9%96%8B%E7%99%BC%E6%9C%80%E9%9B%A3%E7%9A%84%E4%B8%8D%E6%98%AF%E5%AF%AB%E7%A8%8B%E5%BC%8F-d5973d6f4d41)
+    *   [MVP 最終成果報告：交付內容、驗證證據與已知限制](https://github.com/zonawang/aidd-line-bot/blob/mvp-closeout/aidlc/spaces/default/intents/261005-lunch-decision-bot/mvp-final-report.md)
+*   **核心技術：**
+    *   `Codex CLI + AI-DLC` 需求、設計、實作、測試、核准與版本化開發紀錄
+    *   `Node.js 24 + TypeScript + Fastify` 可本機執行的單程序 MVP
+    *   `LINE Messaging API` 原始本文 HMAC 驗簽、Webhook、Quick Reply 與 Reply API
+    *   `Google Places API (New)` Nearby Search、距離篩選與營業狀態處理
+    *   `Vitest + Local CI` 單元、關鍵整合與端到端測試；離線合成 Demo
+*   **關鍵亮點：**
+    *   **AIDD 不等於在產品裡放 LLM**：AI 參與的是開發過程；Bot 的午餐推薦使用餐廳資料與明確規則，不靠模型編造店家。
+    *   **先完成使用者用得到的流程**：經確認先交付「無歷史 MVP」，不把資料庫與 VM 問題當成推薦功能的啟動前提；一年歷史與完整保護留待後續，沒有刪除或冒充已完成。
+    *   **真實 LINE 驗證與合成測試分開**：已有一次受控 Places 查詢、LINE 回覆與使用者確認收到餐廳／地圖的證據；`npm run demo` 則使用合成資料，不外呼、不消耗 API 額度。
+    *   **結果有證據，限制也有紀錄**：本次 workflow 完成 19/19 階段，本機 CI 七項通過，應用原始碼行覆蓋率 90.75%；不把這些結果等同原完整版本或 production-ready。
+*   **目前界線：** 尚未提供一年歷史保存、查閱、刪除與到期清除；必要安全掃描、hosted CI 與正式上線仍未完成。一次真實查詢授權已用完，臨時 HTTPS 入口不保證持續可用，再次真實 Demo 需新的明確授權。
+
+---
+
 ## 🛠️ 實驗室技術雷達 (Tech Stack Radar)
 
 在本實驗室中，我們廣泛運用並實踐了以下技術棧：
@@ -635,11 +661,12 @@ LINE Cafe Bot 已經陪使用者找店、收藏、安排時間、完成造訪並
 | :--- | :--- |
 | **通訊渠道 (Messaging)** | LINE Messaging API (Group & Join Events / Mention Self Detection / Push Message / Retry Key / Postback Action / Location Action / Dynamic Sender / Client-side Rich Menu Switch / Default Rich Menu Deployment / Loading Animation / Datetime Picker / Camera & Camera Roll Actions / Message Action / Webhook Signature Verification), Rich Menu (2×2 / 2x2+1 Grid / High Compress), Flex Message (Carousel), Quick Reply, Blob API |
 | **人工智慧 (AI/LLM)** | Gemini API Function Calling (自然語言時間與偏好解析), Gemini Structured Recap (統計約束摘要 / Thinking Budget 控制 / Deterministic Fallback), Vertex AI Gemini Semantic Field Routing (只選擇既有欄位), Vertex AI Google Maps Grounding, Gemini Enterprise Agent Platform, Google ADK, PreloadMemoryTool, Gemini 2.5 Multimodal (Flash/Pro) |
+| **地點搜尋 (Location Search)** | Google Places API (New) / Nearby Search, 一公里候選篩選與營業狀態處理, Google Maps 連結與來源標示 |
 | **雲端部署 (Deployment)** | Cloud Run (Runtime Service Account / CPU Throttling Avoidance / Connection Holding / Health Check / Webhook Verify & Rollback), GitHub Actions, Google Cloud Tasks (Scheduled HTTP Task / Retry), Google Apps Script, Vercel / Render |
 | **資料記憶 (Database/Memory)**| Cloud Firestore (參訪群組獨立記憶與自訂欄位 / 短期搜尋 Session / 推薦 Context / 收藏清單 / 想去清單與穩定 ID 去重 / 咖啡足跡統計 / Passport Summary Fingerprint Cache / Group Plan、Group Schedule、候選與單一有效票 / Planned Visit / 個人偏好 / Pending Action / Reminder State / Delivery Lock / TTL / Transaction Lock), `faq.json` 靜態問答, ChineseFirestoreMemoryService (中文分詞檢索) |
 | **資訊安全 (Security)** | OIDC Task Authentication, Internal Task Secret, Application Default Credentials (ADC), IAM, Secret Manager, Secretless Auth, 分享卡個資移除, Pending Action 二次確認, Plan / Schedule ID 與群組／使用者綁定, Exactly-Once Deduplication (雙重快取去重) |
-| **開發語言與環境** | Python 3.9+, Node.js 22 (--experimental-require-module), TypeScript, ESM/CJS, Express / Express Static, Vanilla HTML/CSS/JS, SVG / PNG, @resvg/resvg-js, @line/bot-sdk, @google/genai |
-| **輔助開發 (AI Copilot)** | Codex App + Sol / Terra / Luna, Cursor, ChatGPT, Claude |
+| **開發語言與環境** | Python 3.9+, Node.js 22 (--experimental-require-module), Node.js 24, TypeScript, ESM/CJS, Express / Express Static, Fastify, Vitest, Vanilla HTML/CSS/JS, SVG / PNG, @resvg/resvg-js, @line/bot-sdk, @google/genai |
+| **輔助開發 (AI Copilot)** | Codex App + Sol / Terra / Luna, Codex CLI + AI-DLC (AIDD 開發流程與版本化紀錄), Cursor, ChatGPT, Claude |
 
 ---
 
