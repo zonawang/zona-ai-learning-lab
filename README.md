@@ -14,6 +14,8 @@
 
 我們採用漸進式學習與開發，從最基礎的串接驗證，逐步演進至多模態大腦與高安全性雲端部署。以下是專案的演進軌跡：
 
+圖中的框寬統一用 12 天作視覺標示，僅對齊各專案的起始日期，不代表實際開發工期；成果與完成狀態請見下方各站說明。
+
 ```mermaid
 %%{init: {"gantt": {"rightPadding": 180}}}%%
 gantt
@@ -47,7 +49,7 @@ gantt
     Passport      :active, p24, 2026-09-09, 12d
     Visit Bot     :p25, 2026-10-01, 12d
     Group Memory  :p26, 2026-10-03, 12d
-    AIDD Lunch    :milestone, p27, 2026-10-06, 0d
+    AIDD Lunch    :p27, 2026-10-05, 12d
 
     section Other Projects
     Tokyo Trip    :p7, 2026-06-22, 12d
